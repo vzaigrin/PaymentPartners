@@ -176,35 +176,33 @@
 
 (defun field2value (field year month error)
     "Генерируем значение по описанию поля"
-    (if (equal (field-type field) "TIMESTAMP")
-        (gen-timestamp year month error)
-        (if (field-nullable field)
-            ""
-            (if (null (field-values field))
-                (exit-error
-                    (format nil "Неправильный формат шаблона. Нет значения поля ~a" (field-name field)))
-                (cond
-                    ((eq (car (field-values field)) :LIST)
-                        (get-from-list (cdr (field-values field))))
-                    ((and
-                        (eq (car (field-values field)) :RANGE)
-                        (equal (field-type field) "INT64"))
-                        (format nil
-                            (if (field-length field)
-                                (concatenate 'string "~" (write-to-string (field-length field)) ",'0d")
-                                "~d")
-                            (random-range
-                                (second (field-values field))
-                                (third (field-values field)))))
-                    ((and
-                        (eq (car (field-values field)) :RANGE)
-                        (equal (field-type field) "FLOAT64"))
-                        (format nil "~,2f"
-                            (/ (random-range
-                                (* 100 (second (field-values field)))
-                                (* 100 (third (field-values field))))
-                                100.0)))
-                    (t ""))))))
+    (cond
+        ((field-nullable field) "")
+        ((equal (field-type field) "TIMESTAMP")
+            (gen-timestamp year month error))
+        ((null (field-values field))
+            (exit-error
+                (format nil "Неправильный формат шаблона. Нет значения для поля ~a" (field-name field))))
+        ((eq (car (field-values field)) :LIST)
+            (get-from-list (cdr (field-values field))))
+        ((eq (car (field-values field)) :RANGE)
+            (cond
+                ((equal (field-type field) "INT64")
+                    (format nil
+                        (if (field-length field)
+                            (concatenate 'string "~" (write-to-string (field-length field)) ",'0d")
+                            "~d")
+                        (random-range
+                            (second (field-values field))
+                            (third (field-values field)))))
+                ((equal (field-type field) "FLOAT64")
+                    (format nil "~,2f"
+                        (/ (random-range
+                            (* 100 (second (field-values field)))
+                            (* 100 (third (field-values field))))
+                            100.0)))
+                (t "")))
+        (t "")))
 
 (defun main ()
     ;; разбираем аргументы коммандной строки и заполняем структуру params
