@@ -259,11 +259,7 @@
                         (field2value x
                             (parameters-year params)
                             (parameters-month params)
-                            (parameters-errors params))) fields)))
-            )
-        )
-    )
-)
+                            (parameters-errors params))) fields)))))))
 
 ;;; Компилируем и выходим
 (sb-ext:save-lisp-and-die "data-gen" :toplevel #'main :executable t)

@@ -112,7 +112,9 @@
 - V_DM_PAYMENT_RETAIL - отчёт по среднему чеку для партнёра Retail
 
 ## Реализация
-DDL сейчас разработан для Vertica. Потом система будет реализована на сервисах [Google Cloud Platform](https://cloud.google.com)
+Система реализована на сервисах [Google Cloud Platform](https://cloud.google.com):
+- Данные загружаются в [Cloud Storage](https://cloud.google.com/storage/)
+- Для DWH используется [BigQuery](https://cloud.google.com/bigquery/)
 
 ## Перспектива
 В дальнейшем к системе можно будет добавить обработку потоковых данных о транзакциях партнёров.
