@@ -1,0 +1,56 @@
+{
+  "fields": [
+    {
+      "name": "operation_ts",
+      "type": "TIMESTAMP"
+    },
+    {
+      "name": "operation_country",
+      "type": "STRING",
+      "values": {
+        "list": ["Австрия", "Бельгия", "Великобритания", "Германия", "Греция", "Испания", "Италия", "Нидерланды"]
+      }
+    },
+    {
+      "name": "operation_city",
+      "type": "STRING",
+      "nullable": true
+    },
+    {
+      "name": "card_bin",
+      "type": "INT64",
+      "values": {
+        "range": [400000, 499999]
+      }
+    },
+    {
+      "name": "card_number",
+      "type": "INT64",
+      "length": 4,
+      "values": {
+        "range": [0, 9999]
+      }
+    },
+    {
+      "name": "service",	
+      "type": "STRING",
+      "values": {
+        "list": ["Услуга 1", "Услуга 2", "Услуга 3", "Услуга 4"]
+      }
+    },
+    {
+      "name": "payment_tariff",
+      "type": "FLOAT64",
+      "values": {
+        "range": [100.0, 500.0]
+      }
+    },
+    {
+      "name": "payment_ps",
+      "type": "FLOAT64",
+      "values": {
+        "range": [10.0, 20.0]
+      }
+    }
+  ]
+}

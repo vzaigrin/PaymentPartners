@@ -1,0 +1,58 @@
+{
+  "fields": [
+    {
+      "name": "order_id",
+      "type": "INT64",
+      "values": {
+        "range": [10000, 19999]
+      }
+    },
+    {
+      "name": "card_bin",
+      "type": "INT64",
+      "values": {
+        "range": [400000, 499999]
+      }
+    },
+    {
+      "name": "card_number",
+      "type": "INT64",
+      "length": 4,
+      "values": {
+        "range": [0, 9999]
+      }
+    },
+    {
+      "name": "bill_date",
+      "type": "TIMESTAMP"
+    },
+    {
+      "name": "transaction_amount",
+      "type": "FLOAT64",
+      "values": {
+        "range": [100.0, 50000.0]
+      }
+    },
+    {
+      "name": "ps_financing",
+      "type": "FLOAT64",
+      "values": {
+        "range": [10.0, 20.0]
+      }
+    },
+    {
+      "name": "partner_financing",
+      "type": "FLOAT64",
+      "values": {
+        "range": [0.0, 5.0]
+      }
+    },
+    {
+      "name": "location",
+      "type": "STRING",
+      "values": {
+        "list": ["Москва", "Санкт-Петербург", "Сочи", "Екатеринбург", "Казань", "Краснодар", "Пермь"]
+      }
+    }
+  ]
+}
