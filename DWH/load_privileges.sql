@@ -1,5 +1,5 @@
 -- Процедура заполнения таблиц в областях ODS и DDS данными о привилегиях после заполнения таблицы в области Sprivilege_shorte
-CREATE OR REPLACE PROCEDURE PP.LOAD_PRIVILEGE ()
+CREATE OR REPLACE PROCEDURE PP.LOAD_PRIVILEGES ()
 BEGIN
 
     -- Очищаем таблицу с данными о привилегиях в области ODS
@@ -36,7 +36,7 @@ BEGIN
         , MD5(CONCAT(privilege_type)) AS _hash
     FROM PP.ODS_PRIVILEGES
     ) o
-    FULL JOIN PP.SUB_PRIVILEGES s
+    FULL JOIN PP.SAT_PRIVILEGES s
     ON o._hash = s._hash;
 
     -- Очищаем HUB_PRIVILEGES и заполняем его новыми данными
@@ -46,10 +46,10 @@ BEGIN
     SELECT privilege_id, processed_dttm, valid_from_dttm, valid_to_dttm
     FROM PP.temp;
 
-    -- Очищаем SUB_PRIVILEGES и заполняем его новыми данными
-    DELETE FROM PP.SUB_PRIVILEGES WHERE true;
+    -- Очищаем SAT_PRIVILEGES и заполняем его новыми данными
+    DELETE FROM PP.SAT_PRIVILEGES WHERE true;
 
-    INSERT INTO PP.SUB_PRIVILEGES
+    INSERT INTO PP.SAT_PRIVILEGES
     SELECT *
     FROM PP.temp;
 

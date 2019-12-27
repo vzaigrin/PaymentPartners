@@ -1,3 +1,5 @@
+-- Тестирование процесса перегрузки данных о партнёрах
+
 -- Этап 1 - загрузка данных в пустые таблицы
 
 -- Очищаем таблицу с данными о партнёрах в области Stage
@@ -68,10 +70,10 @@ SELECT partner_id, processed_dttm, valid_from_dttm, valid_to_dttm
 FROM PP.temp
 ;
 
--- Очищаем SUB_PARTNERS и заполняем его новыми данными
-DELETE FROM PP.SUB_PARTNERS WHERE true;
+-- Очищаем SAT_PARTNERS и заполняем его новыми данными
+DELETE FROM PP.SAT_PARTNERS WHERE true;
 
-INSERT INTO PP.SUB_PARTNERS
+INSERT INTO PP.SAT_PARTNERS
 SELECT *
 FROM PP.temp
 ;
@@ -84,7 +86,7 @@ SELECT * FROM PP.HUB_PARTNERS;
 --3         6ced0978-43d3-40f3-beba-4dbd8ac38e83    2019-12-25 20:01:18.768857 UTC  2019-12-25 20:01:18.768857 UTC  null
 --4         66a42f3c-a8f3-4453-967c-772ed364b3e3    2019-12-25 20:01:18.768857 UTC  2019-12-25 20:01:18.768857 UTC  null
 
-SELECT * FROM PP.SUB_PARTNERS;
+SELECT * FROM PP.SAT_PARTNERS;
 --Строка    partner_id                              partner_name    tag     processed_dttm                  valid_from_dttm                 valid_to_dttm   _hash	
 --1         66a42f3c-a8f3-4453-967c-772ed364b3e3    retail          Retail  2019-12-25 20:01:18.768857 UTC  2019-12-25 20:01:18.768857 UTC  null            SLM/FPyGEiGXJc512VJ07w==
 --2         6ced0978-43d3-40f3-beba-4dbd8ac38e83    cinema          Cinema  2019-12-25 20:01:18.768857 UTC  2019-12-25 20:01:18.768857 UTC  null            ADFhMZyuajy2OPbKelnKSw==
@@ -156,7 +158,7 @@ FROM (
     , MD5(CONCAT(partner_name, tag)) AS _hash
    FROM PP.ODS_PARTNERS
 ) o
-FULL JOIN PP.SUB_PARTNERS s
+FULL JOIN PP.SAT_PARTNERS s
 ON o._hash = s._hash
 ;
 
@@ -168,10 +170,10 @@ SELECT partner_id, processed_dttm, valid_from_dttm, valid_to_dttm
 FROM PP.temp
 ;
 
--- Очищаем SUB_PARTNERS и заполняем его новыми данными
-DELETE FROM PP.SUB_PARTNERS WHERE true;
+-- Очищаем SAT_PARTNERS и заполняем его новыми данными
+DELETE FROM PP.SAT_PARTNERS WHERE true;
 
-INSERT INTO PP.SUB_PARTNERS
+INSERT INTO PP.SAT_PARTNERS
 SELECT *
 FROM PP.temp
 ;
@@ -185,7 +187,7 @@ SELECT * FROM PP.HUB_PARTNERS;
 --4         66a42f3c-a8f3-4453-967c-772ed364b3e3    2019-12-25 20:01:18.768857 UTC  2019-12-25 20:01:18.768857 UTC  null
 --5         76efb5d0-e226-4148-ad90-0ff946b69d22    2019-12-25 20:01:18.768857 UTC  2019-12-25 20:01:18.768857 UTC  2019-12-26 09:56:38.510598 UTC
 
-SELECT * FROM PP.SUB_PARTNERS;
+SELECT * FROM PP.SAT_PARTNERS;
 --Строка    partner_id                              partner_name    tag     processed_dttm                  valid_from_dttm                 valid_to_dttm                   _hash	
 --1         76efb5d0-e226-4148-ad90-0ff946b69d22    taxi            Taxi    2019-12-25 20:01:18.768857 UTC  2019-12-25 20:01:18.768857 UTC  2019-12-26 09:56:38.510598 UTC  E28N85GKAHO+JURQzjruhQ==
 --2         a50b9d98-e350-4317-b0b9-bc13a84074d6    taxi2           Taxi    2019-12-26 09:56:38.510598 UTC  2019-12-26 09:56:38.510598 UTC  null                            t3HvHJhx2GMxataEHHKNFw==

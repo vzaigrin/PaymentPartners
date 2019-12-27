@@ -5,8 +5,7 @@ DROP TABLE IF EXISTS PP.STG_PARTNERS;
 CREATE TABLE PP.STG_PARTNERS (
     partner_name                STRING NOT NULL
     , tag                       STRING NOT NULL
-) 
-;
+);
 
 DROP TABLE IF EXISTS PP.STG_BINS;
 CREATE TABLE PP.STG_BINS (
@@ -15,16 +14,14 @@ CREATE TABLE PP.STG_BINS (
     , range_to                  STRING NOT NULL
     , bank                      STRING NOT NULL
     , card_type                 STRING NOT NULL
-) 
-;
+);
 
 DROP TABLE IF EXISTS PP.STG_PRIVILEGES;
 CREATE TABLE PP.STG_PRIVILEGES (
     privilege_type              STRING NOT NULL
     , privilege_short           STRING NOT NULL
     , privilege_full            STRING NOT NULL
-) 
-;
+);
 
 DROP TABLE IF EXISTS PP.STG_TAXI;
 CREATE TABLE PP.STG_TAXI (
@@ -36,11 +33,7 @@ CREATE TABLE PP.STG_TAXI (
     , tariff                    FLOAT64 NOT NULL
     , ps_financing              FLOAT64 NOT NULL
     , taxi_financing            FLOAT64 NOT NULL
-    , period_name               STRING NOT NULL
-    , filename                  STRING NOT NULL
-    , load_ts                   TIMESTAMP NOT NULL
-)
-;
+);
 
 DROP TABLE IF EXISTS PP.STG_TELECOM;
 CREATE TABLE PP.STG_TELECOM (
@@ -52,11 +45,7 @@ CREATE TABLE PP.STG_TELECOM (
     , service                   STRING NOT NULL
     , payment_tariff            FLOAT64 NOT NULL
     , payment_ps                FLOAT64 NOT NULL
-    , period_name               STRING NOT NULL
-    , filename                  STRING NOT NULL
-    , load_ts                   TIMESTAMP NOT NULL
-)
-;
+);
 
 DROP TABLE IF EXISTS PP.STG_CINEMA;
 CREATE TABLE PP.STG_CINEMA (
@@ -68,11 +57,7 @@ CREATE TABLE PP.STG_CINEMA (
     , film                      STRING NOT NULL
     , rrn                       STRING NOT NULL
     , card_number               STRING NOT NULL
-    , period_name               STRING NOT NULL
-    , filename                  STRING NOT NULL
-    , load_ts                   TIMESTAMP NOT NULL
-) 
-;
+);
 
 DROP TABLE IF EXISTS PP.STG_RETAIL;
 CREATE TABLE PP.STG_RETAIL (
@@ -84,11 +69,7 @@ CREATE TABLE PP.STG_RETAIL (
     , ps_financing              FLOAT64 NOT NULL
     , partner_financing         FLOAT64 NOT NULL
     , location                  STRING NOT NULL
-    , period_name               STRING NOT NULL
-    , filename                  STRING NOT NULL
-    , load_ts                   TIMESTAMP NOT NULL
-) 
-;
+);
 
 
 -- ODS
@@ -96,8 +77,7 @@ DROP TABLE IF EXISTS PP.ODS_PARTNERS;
 CREATE TABLE PP.ODS_PARTNERS (
     partner_name                STRING NOT NULL
     , tag                       STRING NOT NULL
-) 
-;
+);
 
 DROP TABLE IF EXISTS PP.ODS_BINS;
 CREATE TABLE PP.ODS_BINS (
@@ -106,16 +86,14 @@ CREATE TABLE PP.ODS_BINS (
     , range_to                  STRING NOT NULL
     , bank                      STRING NOT NULL
     , card_type                 STRING NOT NULL
-) 
-;
+);
 
 DROP TABLE IF EXISTS PP.ODS_PRIVILEGES;
 CREATE TABLE PP.ODS_PRIVILEGES (
     privilege_type              STRING NOT NULL
     , privilege_short           STRING NOT NULL
     , privilege_full            STRING NOT NULL
-) 
-;
+);
 
 DROP TABLE IF EXISTS PP.ODS_TAXI;
 CREATE TABLE PP.ODS_TAXI (
@@ -127,11 +105,11 @@ CREATE TABLE PP.ODS_TAXI (
     , tariff                    FLOAT64 NOT NULL
     , ps_financing              FLOAT64 NOT NULL
     , taxi_financing            FLOAT64 NOT NULL
-    , period_name               STRING NOT NULL
+    , period_year               INT64 NOT NULL
+    , period_month              INT64 NOT NULL
     , filename                  STRING NOT NULL
     , load_ts                   TIMESTAMP NOT NULL
-) 
-;
+);
 
 DROP TABLE IF EXISTS PP.ODS_TELECOM;
 CREATE TABLE PP.ODS_TELECOM (
@@ -143,11 +121,11 @@ CREATE TABLE PP.ODS_TELECOM (
     , service                   STRING NOT NULL
     , payment_tariff            FLOAT64 NOT NULL
     , payment_ps                FLOAT64 NOT NULL
-    , period_name               STRING NOT NULL
+    , period_year               INT64 NOT NULL
+    , period_month              INT64 NOT NULL
     , filename                  STRING NOT NULL
     , load_ts                   TIMESTAMP NOT NULL
-) 
-;
+);
 
 DROP TABLE IF EXISTS PP.ODS_CINEMA;
 CREATE TABLE PP.ODS_CINEMA (
@@ -159,11 +137,11 @@ CREATE TABLE PP.ODS_CINEMA (
     , film                      STRING NOT NULL
     , rrn                       STRING NOT NULL
     , card_number               STRING NOT NULL
-    , period_name               STRING NOT NULL
+    , period_year               INT64 NOT NULL
+    , period_month              INT64 NOT NULL
     , filename                  STRING NOT NULL
     , load_ts                   TIMESTAMP NOT NULL
-) 
-;
+);
 
 DROP TABLE IF EXISTS PP.ODS_RETAIL;
 CREATE TABLE PP.ODS_RETAIL (
@@ -175,11 +153,11 @@ CREATE TABLE PP.ODS_RETAIL (
     , ps_financing              FLOAT64 NOT NULL
     , partner_financing         FLOAT64 NOT NULL
     , location                  STRING NOT NULL
-    , period_name               STRING NOT NULL
+    , period_year               INT64 NOT NULL
+    , period_month              INT64 NOT NULL
     , filename                  STRING NOT NULL
     , load_ts                   TIMESTAMP NOT NULL
-) 
-;
+);
 
 
 -- DDS
@@ -189,21 +167,10 @@ CREATE TABLE PP.HUB_PARTNERS (
     , processed_dttm            TIMESTAMP NOT NULL
     , valid_from_dttm           TIMESTAMP NOT NULL
     , valid_to_dttm             TIMESTAMP
-) 
-;
+);
 
-CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_HUB_PARTNERS` AS
-SELECT
-    partner_id
-    , processed_dttm
-    , valid_from_dttm
-    , valid_to_dttm
-FROM `my-project-1530001957977.PP.HUB_PARTNERS`
-WHERE valid_to_dttm IS NULL
-;
-
-DROP TABLE IF EXISTS PP.SUB_PARTNERS;
-CREATE TABLE PP.SUB_PARTNERS (
+DROP TABLE IF EXISTS PP.SAT_PARTNERS;
+CREATE TABLE PP.SAT_PARTNERS (
     partner_id                  STRING NOT NULL
     , partner_name              STRING NOT NULL
     , tag                       STRING NOT NULL
@@ -211,22 +178,18 @@ CREATE TABLE PP.SUB_PARTNERS (
     , valid_from_dttm           TIMESTAMP NOT NULL
     , valid_to_dttm             TIMESTAMP
     , _hash                     BYTES NOT NULL
-) 
-;
+);
 
 DROP TABLE IF EXISTS PP.HUB_DATA;
 CREATE TABLE PP.HUB_DATA (
     data_id                     STRING NOT NULL
     , processed_dttm            TIMESTAMP NOT NULL
-) 
-PARTITION BY _PARTITIONDATE
-;
+);
 
-DROP TABLE IF EXISTS PP.SUB_DATA;
-CREATE TABLE PP.SUB_DATA (
+DROP TABLE IF EXISTS PP.SAT_DATA;
+CREATE TABLE PP.SAT_DATA (
     data_id                     STRING NOT NULL
     , card_number               STRING NOT NULL
-    , card_is_premium           BOOL NOT NULL
     , operation_ts              TIMESTAMP NOT NULL
     , period_year               INT64 NOT NULL
     , period_month              INT64 NOT NULL
@@ -240,34 +203,28 @@ CREATE TABLE PP.SUB_DATA (
     , payment_partner           FLOAT64 NOT NULL
     , payment_other_client      FLOAT64 NOT NULL
     , processed_dttm            TIMESTAMP NOT NULL
-    , _hash                     BYTES NOT NULL
-) 
-PARTITION BY _PARTITIONDATE
-;
+);
 
 DROP TABLE IF EXISTS PP.LNK_DATA_PARTNERS;
 CREATE TABLE PP.LNK_DATA_PARTNERS (
     data_id                     STRING NOT NULL
     , partner_id                STRING NOT NULL
     , processed_dttm            TIMESTAMP NOT NULL
-) 
-;
+);
 
 DROP TABLE IF EXISTS PP.LNK_DATA_BINS;
 CREATE TABLE PP.LNK_DATA_BINS (
     data_id                     STRING NOT NULL
     , bin_id                    STRING NOT NULL
     , processed_dttm            TIMESTAMP NOT NULL
-) 
-;
+);
 
 DROP TABLE IF EXISTS PP.LNK_DATA_PRIVILEGES;
 CREATE TABLE PP.LNK_DATA_PRIVILEGES (
     data_id                     STRING NOT NULL
     , privilege_id              STRING NOT NULL
     , processed_dttm            TIMESTAMP NOT NULL
-) 
-;
+);
 
 DROP TABLE IF EXISTS PP.HUB_BINS;
 CREATE TABLE PP.HUB_BINS (
@@ -275,21 +232,10 @@ CREATE TABLE PP.HUB_BINS (
     , processed_dttm            TIMESTAMP NOT NULL
     , valid_from_dttm           TIMESTAMP NOT NULL
     , valid_to_dttm             TIMESTAMP
-) 
-;
+);
 
-CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_HUB_BINS` AS
-SELECT
-    bin_id
-    , processed_dttm
-    , valid_from_dttm
-    , valid_to_dttm
-FROM `my-project-1530001957977.PP.HUB_BINS`
-WHERE valid_to_dttm IS NULL
-;
-
-DROP TABLE IF EXISTS PP.SUB_BINS;
-CREATE TABLE PP.SUB_BINS (
+DROP TABLE IF EXISTS PP.SAT_BINS;
+CREATE TABLE PP.SAT_BINS (
     bin_id                      STRING NOT NULL
     , bin                       STRING NOT NULL
     , range_from                STRING NOT NULL
@@ -300,8 +246,7 @@ CREATE TABLE PP.SUB_BINS (
     , valid_from_dttm           TIMESTAMP NOT NULL
     , valid_to_dttm             TIMESTAMP
     , _hash                     BYTES NOT NULL
-) 
-;
+);
 
 DROP TABLE IF EXISTS PP.HUB_PRIVILEGES;
 CREATE TABLE PP.HUB_PRIVILEGES (
@@ -309,21 +254,10 @@ CREATE TABLE PP.HUB_PRIVILEGES (
     , processed_dttm            TIMESTAMP NOT NULL
     , valid_from_dttm           TIMESTAMP NOT NULL
     , valid_to_dttm             TIMESTAMP
-) 
-;
+);
 
-CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_HUB_PRIVILEGES` AS
-SELECT
-    privilege_id
-    , processed_dttm
-    , valid_from_dttm
-    , valid_to_dttm
-FROM `my-project-1530001957977.PP.HUB_PRIVILEGES` p
-WHERE valid_to_dttm IS NULL
-;
-
-DROP TABLE IF EXISTS PP.SUB_PRIVILEGES;
-CREATE TABLE PP.SUB_PRIVILEGES (
+DROP TABLE IF EXISTS PP.SAT_PRIVILEGES;
+CREATE TABLE PP.SAT_PRIVILEGES (
     privilege_id                STRING NOT NULL
     , privilege_type            STRING NOT NULL
     , privilege_short           STRING NOT NULL
@@ -332,8 +266,7 @@ CREATE TABLE PP.SUB_PRIVILEGES (
     , valid_from_dttm           TIMESTAMP NOT NULL
     , valid_to_dttm             TIMESTAMP
     , _hash                     BYTES NOT NULL
-) 
-;
+);
 
 
 -- Data Marts
@@ -341,11 +274,69 @@ DROP TABLE IF EXISTS PP.DM_LOADS;
 CREATE TABLE PP.DM_LOADS (
     partner_name                STRING NOT NULL
     , period_name               STRING NOT NULL
+    , period_year               INT64 NOT NULL
+    , period_month              INT64 NOT NULL
     , filename                  STRING NOT NULL
     , load_ts                   TIMESTAMP NOT NULL
+    , total                     INT64
     , good                      INT64
     , bad                       INT64
-) 
+);
+
+CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_LOADS_TAXI` AS
+SELECT
+    period_name
+    , period_year
+    , period_month
+    , filename
+    , load_ts
+    , total
+    , good
+    , bad
+FROM `my-project-1530001957977.PP.DM_LOADS` p
+WHERE upper(p.partner_name) = 'TAXI'
+;
+
+CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_LOADS_TELECOM` AS
+SELECT
+    period_name
+    , period_year
+    , period_month
+    , filename
+    , load_ts
+    , total
+    , good
+    , bad
+FROM `my-project-1530001957977.PP.DM_LOADS` p
+WHERE upper(p.partner_name) = 'TELECOM'
+;
+
+CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_LOADS_CINEMA` AS
+SELECT
+    period_name
+    , period_year
+    , period_month
+    , filename
+    , load_ts
+    , total
+    , good
+    , bad
+FROM `my-project-1530001957977.PP.DM_LOADS` p
+WHERE upper(p.partner_name) = 'CINEMA'
+;
+
+CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_LOADS_RETAIL` AS
+SELECT
+    period_name
+    , period_year
+    , period_month
+    , filename
+    , load_ts
+    , total
+    , good
+    , bad
+FROM `my-project-1530001957977.PP.DM_LOADS` p
+WHERE upper(p.partner_name) = 'RETAIL'
 ;
 
 DROP TABLE IF EXISTS PP.DM_REPORT;
@@ -371,9 +362,7 @@ CREATE TABLE PP.DM_REPORT (
     , payment_partner           FLOAT64 NOT NULL
     , payment_other_client      FLOAT64 NOT NULL
     , trans_num                 INT64 NOT NULL
-) 
-PARTITION BY _PARTITIONDATE
-;
+);
 
 CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_CARD` AS
 SELECT

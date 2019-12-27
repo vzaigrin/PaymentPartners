@@ -5,37 +5,30 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
+	"google.golang.org/api/iterator"
 )
 
-// GCSEvent is the payload of a GCS event. Please refer to the docs for
-// additional information regarding GCS events.
-type GCSEvent struct {
-	Bucket string `json:"bucket"`
-	Name   string `json:"name"`
+// PubSubMessage is the payload of a Pub/Sub event.
+type PubSubMessage struct {
+	Data []byte `json:"data"`
 }
 
-func LoadData(ctx context.Context, e GCSEvent) error {
-	log.Printf("Processing bucket: %s", e.Bucket)
-	log.Printf("Processing file: %s", e.Name)
-
+// GoPubSub consumes a Pub/Sub message.
+func GoPubSub(ctx context.Context, m PubSubMessage) error {
+	bucket := "pps"
 	projectID := "my-project-1530001957977"
 	datasetID := "PP"
-	splitName := strings.Split(e.Name, "/")
-	fileName := splitName[len(splitName)-1]
 
-	// Определяем папку, в которой появился файл
-	// Загружаем только файлы, которые появились в папке dicts
-	// Если файл появился в папке inbox (реестр партнёра) - ничего не делаем
-	// Реестры обрабатываются другой процедурой по расписанию
-	if splitName[0] != "dicts" {
+	name := string(m.Data)
+	if name != "go" {
 		return nil
 	}
 
-	// По имени файла получаем название справочника (имя таблицы)
-	tableID := strings.ToUpper(strings.Split(fileName, ".")[0])
+	log.Printf("Let's %s!", name)
 
 	// Создаём клиента для BigQuery
 	clientBQ, err := bigquery.NewClient(ctx, projectID)
@@ -43,46 +36,80 @@ func LoadData(ctx context.Context, e GCSEvent) error {
 		return fmt.Errorf("bigquery.NewClient: %v", err)
 	}
 
-	gcsRef := bigquery.NewGCSReference("gs://" + e.Bucket + "/" + e.Name)
-	gcsRef.SourceFormat = bigquery.CSV
-	gcsRef.AutoDetect = true
-	gcsRef.SkipLeadingRows = 1
-
-	// Загружаем файл в таблицу в области Stage, перезаписывая её
-	loader := clientBQ.Dataset(datasetID).Table("STG_" + tableID).LoaderFrom(gcsRef)
-	loader.WriteDisposition = bigquery.WriteTruncate
-
-	job, err := loader.Run(ctx)
+	// Создаём клинта для Storage
+	client, err := storage.NewClient(ctx)
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
-	status, err := job.Wait(ctx)
-	if err != nil {
-		return err
-	}
+	defer client.Close() // Closing the client safely cleans up background resources.
 
-	if status.Err() != nil {
-		return fmt.Errorf("Load job completed with error: %v", status.Err())
-	}
+	// Читаем папку inbox
+	it := client.Bucket(bucket).Objects(ctx, &storage.Query{Prefix: "inbox"})
+	for {
+		attrs, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		log.Printf(attrs.Name)
 
-	// Если файл загружен успешно в область Stage, то вызываем процедуру для перегрузки данных в области ODS и DDS
-	q := clientBQ.Query("CALL " + datasetID + ".LOAD_" + tableID + "();")
-	job, err = q.Run(ctx)
-	if err != nil {
-		return fmt.Errorf("Call procedure job completed with error: %v", err)
-	}
+		splitName := strings.Split(attrs.Name, "/")
 
-	// Создаём клиента для Storage
-	clientS, err := storage.NewClient(ctx)
-	if err != nil {
-		return fmt.Errorf("storage.NewClient: %v", err)
-	}
+		// Пропускаем папки
+		if len(splitName) < 3 {
+			continue
+		}
 
-	// Удаляем файл
-	src := clientS.Bucket(e.Bucket).Object(e.Name)
-	err = src.Delete(ctx)
-	if err != nil {
-		return fmt.Errorf("Delete file job completed with error: %v", err)
+		fileName := splitName[len(splitName)-1]
+		tableID := strings.ToUpper(splitName[1])
+
+		// Загрузаем только файлы CSV
+		splitFile := strings.Split(fileName, ".")
+		if len(splitFile) < 2 && strings.ToUpper(splitFile[1]) != "CSV" {
+			continue
+		}
+
+		gcsRef := bigquery.NewGCSReference("gs://" + bucket + "/" + attrs.Name)
+		gcsRef.SourceFormat = bigquery.CSV
+		gcsRef.AutoDetect = true
+		gcsRef.SkipLeadingRows = 1
+
+		// Загружаем файл в таблицу в области Stage, перезаписывая её
+		loader := clientBQ.Dataset(datasetID).Table("STG_" + tableID).LoaderFrom(gcsRef)
+		loader.WriteDisposition = bigquery.WriteTruncate
+
+		job, err := loader.Run(ctx)
+		if err != nil {
+			return err
+		}
+		status, err := job.Wait(ctx)
+		if err != nil {
+			return err
+		}
+
+		if status.Err() != nil {
+			return fmt.Errorf("Load job completed with error: %v", status.Err())
+		}
+
+		// Если файл загружен успешно в область Stage, то вызываем процедуру для перегрузки данных в области ODS и DDS
+		currentTime := time.Now()
+		year := currentTime.Format("2006")
+		month := currentTime.Format("1")
+
+		q := clientBQ.Query("CALL " + datasetID + ".LOAD_" + tableID + "('" + fileName + "'," + year + ", " + month + ")")
+		job, err = q.Run(ctx)
+		if err != nil {
+			return fmt.Errorf("Call procedure job completed with error: %v", err)
+		}
+
+		// Удаляем файл
+		src := client.Bucket(bucket).Object(attrs.Name)
+		err = src.Delete(ctx)
+		if err != nil {
+			return fmt.Errorf("Delete file job completed with error: %v", err)
+		}
 	}
 
 	return nil

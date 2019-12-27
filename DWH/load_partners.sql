@@ -34,7 +34,7 @@ BEGIN
         , MD5(CONCAT(partner_name, tag)) AS _hash
     FROM PP.ODS_PARTNERS
     ) o
-    FULL JOIN PP.SUB_PARTNERS s
+    FULL JOIN PP.SAT_PARTNERS s
     ON o._hash = s._hash;
 
     -- Очищаем HUB_PARTNERS и заполняем его новыми данными
@@ -44,10 +44,10 @@ BEGIN
     SELECT partner_id, processed_dttm, valid_from_dttm, valid_to_dttm
     FROM PP.temp;
 
-    -- Очищаем SUB_PARTNERS и заполняем его новыми данными
-    DELETE FROM PP.SUB_PARTNERS WHERE true;
+    -- Очищаем SAT_PARTNERS и заполняем его новыми данными
+    DELETE FROM PP.SAT_PARTNERS WHERE true;
 
-    INSERT INTO PP.SUB_PARTNERS
+    INSERT INTO PP.SAT_PARTNERS
     SELECT *
     FROM PP.temp;
 

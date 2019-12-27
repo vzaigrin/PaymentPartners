@@ -46,7 +46,7 @@ BEGIN
         , MD5(CONCAT(bin, range_from, range_to)) AS _hash
     FROM PP.ODS_BINS
     ) o
-    FULL JOIN PP.SUB_BINS s
+    FULL JOIN PP.SAT_BINS s
     ON o._hash = s._hash;
 
     -- Очищаем HUB_BINS и заполняем его новыми данными
@@ -56,10 +56,10 @@ BEGIN
     SELECT bin_id, processed_dttm, valid_from_dttm, valid_to_dttm
     FROM PP.temp;
 
-    -- Очищаем SUB_BINS и заполняем его новыми данными
-    DELETE FROM PP.SUB_BINS WHERE true;
+    -- Очищаем SAT_BINS и заполняем его новыми данными
+    DELETE FROM PP.SAT_BINS WHERE true;
 
-    INSERT INTO PP.SUB_BINS
+    INSERT INTO PP.SAT_BINS
     SELECT *
     FROM PP.temp;
 
