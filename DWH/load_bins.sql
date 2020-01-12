@@ -15,10 +15,13 @@ BEGIN
         , card_type
     FROM PP.STG_BINS;
 
+    -- Очищаем TMP_BINS
+    DELETE FROM PP.TMP_BINS WHERE true;
+
     -- Объединяем данные о bins из области ODS с данными в области DDS во временную таблицу
     -- Добавляем записи о bins, которых не было
     -- Помечаем устаревшими записи, которых уже нет
-    CREATE OR REPLACE TABLE PP.temp AS
+    INSERT INTO PP.TMP_BINS
     SELECT
     COALESCE(s.bin_id, o.bin_id) AS bin_id
     , COALESCE(s.bin, o.bin) AS bin
@@ -54,13 +57,13 @@ BEGIN
 
     INSERT INTO PP.HUB_BINS
     SELECT bin_id, processed_dttm, valid_from_dttm, valid_to_dttm
-    FROM PP.temp;
+    FROM PP.TMP_BINS;
 
     -- Очищаем SAT_BINS и заполняем его новыми данными
     DELETE FROM PP.SAT_BINS WHERE true;
 
     INSERT INTO PP.SAT_BINS
     SELECT *
-    FROM PP.temp;
+    FROM PP.TMP_BINS;
 
 END;

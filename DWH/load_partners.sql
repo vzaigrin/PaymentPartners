@@ -9,10 +9,13 @@ BEGIN
     INSERT INTO PP.ODS_PARTNERS
     SELECT DISTINCT * FROM PP.STG_PARTNERS;
 
+    -- Очищаем TMP_PARTNERS
+    DELETE FROM PP.TMP_PARTNERS WHERE true;
+
     -- Объединяем данные о партнёрах из области ODS с данными в области DDS во временную таблицу
     -- Добавляем записи о партнёрах, которых не было
     -- Помечаем устаревшими записи, которых уже нет
-    CREATE OR REPLACE TABLE PP.temp AS
+    INSERT INTO PP.TMP_PARTNERS
     SELECT
     COALESCE(s.partner_id, o.partner_id) AS partner_id
     , COALESCE(s.partner_name, o.partner_name) AS partner_name
@@ -42,13 +45,13 @@ BEGIN
 
     INSERT INTO PP.HUB_PARTNERS
     SELECT partner_id, processed_dttm, valid_from_dttm, valid_to_dttm
-    FROM PP.temp;
+    FROM PP.TMP_PARTNERS;
 
     -- Очищаем SAT_PARTNERS и заполняем его новыми данными
     DELETE FROM PP.SAT_PARTNERS WHERE true;
 
     INSERT INTO PP.SAT_PARTNERS
     SELECT *
-    FROM PP.temp;
+    FROM PP.TMP_PARTNERS;
 
 END;

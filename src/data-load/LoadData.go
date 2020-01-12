@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"os"
-	shared "pp/shared"
 	"strconv"
 	"strings"
 	"time"
@@ -13,15 +12,15 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-// PubSubMessage is the payload of a Pub/Sub event.
+// PubSubMessage is the payload of a Pub/Sub event
 type PubSubMessage struct {
 	Data []byte `json:"data"`
 }
 
-// GoPubSub загружает данные по сообщению в Pub/Sub
-func GoPubSub(ctx context.Context, m PubSubMessage) error {
+// LoadData загружает данные по сообщению в Pub/Sub
+func LoadData(ctx context.Context, m PubSubMessage) error {
 	name := string(m.Data)
-	log.Printf("Processing message: #{name}")
+	log.Printf("Processing message: %v", name)
 	if name != "go" {
 		return nil
 	}
@@ -34,7 +33,7 @@ func GoPubSub(ctx context.Context, m PubSubMessage) error {
 	// Создаём клинта для Storage
 	client, err := storage.NewClient(ctx)
 	if err != nil {
-		log.Printf("storage.NewClient: #{err}")
+		log.Printf("storage.NewClient: %v", err)
 		return err
 	}
 
@@ -46,10 +45,10 @@ func GoPubSub(ctx context.Context, m PubSubMessage) error {
 			break
 		}
 		if err != nil {
-			log.Printf("iterator #{attrs.Name}: #{err}")
+			log.Printf("iterator %v: %v", attrs.Name, err)
 			return err
 		}
-		log.Printf("Processing #{attrs.Name}")
+		log.Printf("Processing %v", attrs.Name)
 
 		splitName := strings.Split(attrs.Name, "/")
 
@@ -68,9 +67,9 @@ func GoPubSub(ctx context.Context, m PubSubMessage) error {
 		}
 
 		// Загружаем файл в таблицу в области Stage, перезаписывая её
-		err = shared.LoadFileToTable(ctx, projectID, datasetID, "STG_"+tableID, "gs://" + bucket + "/" + attrs.Name)
+		err = LoadFileToTable(ctx, projectID, datasetID, "STG_"+tableID, "gs://" + bucket + "/" + attrs.Name)
 		if err != nil {
-			log.Printf("Error loading file #{attrs.Name} into table 'STG_#{tableID}': #{err}")
+			log.Printf("Error loading file %v into table 'STG_%v': %v", attrs.Name, tableID, err)
 			return err
 		}
 
@@ -80,16 +79,16 @@ func GoPubSub(ctx context.Context, m PubSubMessage) error {
 		year, month, _ := time1.Date()
 
 		query := "CALL " + datasetID + ".LOAD_" + tableID + "('" + fileName + "'," + strconv.Itoa(year) + ", " + strconv.Itoa(int(month)) + ");"
-		err = shared.RunQuery(ctx, projectID, query)
+		err = RunQuery(ctx, projectID, query)
 		if err != nil {
-			log.Printf("Error running query '#{query}': #{err}")
+			log.Printf("Error running query '%v': %v", query, err)
 			return err
 		}
 
 		// Если файл успешно загружен в таблицу, то удаляем его
-		err = shared.DeleteFile(ctx, bucket, attrs.Name)
+		err = DeleteFile(ctx, bucket, attrs.Name)
 		if err != nil {
-			log.Printf("Error deleting file #{attrs.Name}: #{err}")
+			log.Printf("Error deleting file %v: %v", attrs.Name, err)
 			return err
 		}
 	}

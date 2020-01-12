@@ -161,25 +161,6 @@ CREATE TABLE PP.ODS_RETAIL (
 
 
 -- DDS
-DROP TABLE IF EXISTS PP.HUB_PARTNERS;
-CREATE TABLE PP.HUB_PARTNERS (
-    partner_id                  STRING NOT NULL
-    , processed_dttm            TIMESTAMP NOT NULL
-    , valid_from_dttm           TIMESTAMP NOT NULL
-    , valid_to_dttm             TIMESTAMP
-);
-
-DROP TABLE IF EXISTS PP.SAT_PARTNERS;
-CREATE TABLE PP.SAT_PARTNERS (
-    partner_id                  STRING NOT NULL
-    , partner_name              STRING NOT NULL
-    , tag                       STRING NOT NULL
-    , processed_dttm            TIMESTAMP NOT NULL
-    , valid_from_dttm           TIMESTAMP NOT NULL
-    , valid_to_dttm             TIMESTAMP
-    , _hash                     BYTES NOT NULL
-);
-
 DROP TABLE IF EXISTS PP.HUB_DATA;
 CREATE TABLE PP.HUB_DATA (
     data_id                     STRING NOT NULL
@@ -226,6 +207,36 @@ CREATE TABLE PP.LNK_DATA_PRIVILEGES (
     , processed_dttm            TIMESTAMP NOT NULL
 );
 
+DROP TABLE IF EXISTS PP.HUB_PARTNERS;
+CREATE TABLE PP.HUB_PARTNERS (
+    partner_id                  STRING NOT NULL
+    , processed_dttm            TIMESTAMP NOT NULL
+    , valid_from_dttm           TIMESTAMP NOT NULL
+    , valid_to_dttm             TIMESTAMP
+);
+
+DROP TABLE IF EXISTS PP.SAT_PARTNERS;
+CREATE TABLE PP.SAT_PARTNERS (
+    partner_id                  STRING NOT NULL
+    , partner_name              STRING NOT NULL
+    , tag                       STRING NOT NULL
+    , processed_dttm            TIMESTAMP NOT NULL
+    , valid_from_dttm           TIMESTAMP NOT NULL
+    , valid_to_dttm             TIMESTAMP
+    , _hash                     BYTES NOT NULL
+);
+
+DROP TABLE IF EXISTS PP.TMP_PARTNERS;
+CREATE TABLE PP.TMP_PARTNERS (
+    partner_id                  STRING NOT NULL
+    , partner_name              STRING NOT NULL
+    , tag                       STRING NOT NULL
+    , processed_dttm            TIMESTAMP NOT NULL
+    , valid_from_dttm           TIMESTAMP NOT NULL
+    , valid_to_dttm             TIMESTAMP
+    , _hash                     BYTES NOT NULL
+);
+
 DROP TABLE IF EXISTS PP.HUB_BINS;
 CREATE TABLE PP.HUB_BINS (
     bin_id                      STRING NOT NULL
@@ -236,6 +247,20 @@ CREATE TABLE PP.HUB_BINS (
 
 DROP TABLE IF EXISTS PP.SAT_BINS;
 CREATE TABLE PP.SAT_BINS (
+    bin_id                      STRING NOT NULL
+    , bin                       STRING NOT NULL
+    , range_from                STRING NOT NULL
+    , range_to                  STRING NOT NULL
+    , bank                      STRING NOT NULL
+    , card_type                 STRING NOT NULL
+    , processed_dttm            TIMESTAMP NOT NULL
+    , valid_from_dttm           TIMESTAMP NOT NULL
+    , valid_to_dttm             TIMESTAMP
+    , _hash                     BYTES NOT NULL
+);
+
+DROP TABLE IF EXISTS PP.TMP_BINS;
+CREATE TABLE PP.TMP_BINS (
     bin_id                      STRING NOT NULL
     , bin                       STRING NOT NULL
     , range_from                STRING NOT NULL
@@ -268,6 +293,17 @@ CREATE TABLE PP.SAT_PRIVILEGES (
     , _hash                     BYTES NOT NULL
 );
 
+DROP TABLE IF EXISTS PP.TMP_PRIVILEGES;
+CREATE TABLE PP.TMP_PRIVILEGES (
+    privilege_id                STRING NOT NULL
+    , privilege_type            STRING NOT NULL
+    , privilege_short           STRING NOT NULL
+    , privilege_full            STRING NOT NULL
+    , processed_dttm            TIMESTAMP NOT NULL
+    , valid_from_dttm           TIMESTAMP NOT NULL
+    , valid_to_dttm             TIMESTAMP
+    , _hash                     BYTES NOT NULL
+);
 
 -- Data Marts
 DROP TABLE IF EXISTS PP.DM_LOADS;

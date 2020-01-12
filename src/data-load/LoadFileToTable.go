@@ -14,7 +14,7 @@ func LoadFileToTable(ctx context.Context, projectID string, datasetID string, ta
 	// Создаём клиента для BigQuery
 	client, err := bigquery.NewClient(ctx, projectID)
 	if err != nil {
-		return fmt.Errorf("bigquery.NewClient: #{err}")
+		return fmt.Errorf("bigquery.NewClient: %v", err)
 	}
 
 	var loader *bigquery.Loader
@@ -32,7 +32,7 @@ func LoadFileToTable(ctx context.Context, projectID string, datasetID string, ta
 		// Читаем локальный файл
 		fo, err := os.Open(filename)
 		if err != nil {
-			return fmt.Errorf("open file #{filename}: #{err}")
+			return fmt.Errorf("open file %v: %v", filename, err)
 		}
 		source := bigquery.NewReaderSource(fo)
 		// Устанавливаем параметры
@@ -47,15 +47,15 @@ func LoadFileToTable(ctx context.Context, projectID string, datasetID string, ta
 
 	job, err := loader.Run(ctx)
 	if err != nil {
-		return fmt.Errorf("loader.Run: #{err}")
+		return fmt.Errorf("loader.Run: %v", err)
 	}
 	status, err := job.Wait(ctx)
 	if err != nil {
-		return fmt.Errorf("job.Wait: #{err}")
+		return fmt.Errorf("job.Wait: %v", err)
 	}
 
 	if status.Err() != nil {
-		return fmt.Errorf("loader: #{status.Err()}")
+		return fmt.Errorf("loader: %v", status.Err())
 	}
 
 	// Закрываем клиента и выходим

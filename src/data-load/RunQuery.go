@@ -11,13 +11,13 @@ func RunQuery(ctx context.Context, projectID string, query string) error {
 	// Создаём клиента для BigQuery
 	client, err := bigquery.NewClient(ctx, projectID)
 	if err != nil {
-		return fmt.Errorf("bigquery.NewClient: #{err}")
+		return fmt.Errorf("bigquery.NewClient: %v", err)
 	}
 
 	// Вызываем query
 	_, err = client.Query(query).Run(ctx)
 	if err != nil {
-		return fmt.Errorf("client.Query.Run: #{err}")
+		return fmt.Errorf("client.Query.Run: %v", err)
 	}
 
 	// Закрываем клиента и выходим

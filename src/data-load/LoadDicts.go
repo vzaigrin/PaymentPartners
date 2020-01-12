@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"os"
-	shared "pp/shared"
 	"strings"
 )
 
@@ -16,8 +15,8 @@ type GCSEvent struct {
 
 // LoadDicts загружает новые справочники из папки dicts в DWH
 func LoadDicts(ctx context.Context, e GCSEvent) error {
-	log.Printf("Processing bucket: #{e.Bucket}")
-	log.Printf("Processing file: #{e.Name}")
+	log.Printf("Processing bucket: %v", e.Bucket)
+	log.Printf("Processing file: %v", e.Name)
 
 	//projectID := "my-project-1530001957977"
 	projectID := os.Getenv("GCP_PROJECT")
@@ -36,24 +35,24 @@ func LoadDicts(ctx context.Context, e GCSEvent) error {
 	tableID := strings.ToUpper(strings.Split(fileName, ".")[0])
 
 	// Загружаем файл в таблицу в области Stage
-	err := shared.LoadFileToTable(ctx, projectID, datasetID, "STG_"+tableID, "gs://"+e.Bucket+"/"+e.Name)
+	err := LoadFileToTable(ctx, projectID, datasetID, "STG_"+tableID, "gs://"+e.Bucket+"/"+e.Name)
 	if err != nil {
-		log.Printf("Error loading table: #{err}")
+		log.Printf("Error loading table: %v", err)
 		return err
 	}
 
 	// Если файл загружен успешно в область Stage, то вызываем процедуру для перегрузки данных в области ODS и DDS
 	query := "CALL " + datasetID + ".LOAD_" + tableID + "();"
-	err = shared.RunQuery(ctx, projectID, query)
+	err = RunQuery(ctx, projectID, query)
 	if err != nil {
-		log.Printf("Error running query '#{query}': #{err}")
+		log.Printf("Error running query '%v': %v", query, err)
 		return err
 	}
 
 	// Если файл успешно загружен в таблицу, то удаляем его
-	err = shared.DeleteFile(ctx, e.Bucket, e.Name)
+	err = DeleteFile(ctx, e.Bucket, e.Name)
 	if err != nil {
-		log.Printf("Error deleting file #{e.Name}: #{err}")
+		log.Printf("Error deleting file %v: %v", e.Name, err)
 		return err
 	}
 

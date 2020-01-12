@@ -5,14 +5,17 @@ BEGIN
     -- Очищаем таблицу с данными о привилегиях в области ODS
     DELETE FROM PP.ODS_PRIVILEGES WHERE true;
 
-    -- Перегружаем данные о привилегиях из области Sprivilege_shorte в область ODS
+    -- Перегружаем данные о привилегиях из области STAGE в область ODS
     INSERT INTO PP.ODS_PRIVILEGES
     SELECT DISTINCT * FROM PP.STG_PRIVILEGES;
+
+    -- Очищаем TMP_PRIVILEGES
+    DELETE FROM PP.TMP_PRIVILEGES WHERE true;
 
     -- Объединяем данные о привилегиях из области ODS с данными в области DDS во временную таблицу
     -- Добавляем записи о привилегиях, которых не было
     -- Помечаем устаревшими записи, которых уже нет
-    CREATE OR REPLACE TABLE PP.temp AS
+    INSERT INTO PP.TMP_PRIVILEGES
     SELECT
     COALESCE(s.privilege_id, o.privilege_id) AS privilege_id
     , COALESCE(s.privilege_type, o.privilege_type) AS privilege_type
@@ -44,13 +47,13 @@ BEGIN
 
     INSERT INTO PP.HUB_PRIVILEGES
     SELECT privilege_id, processed_dttm, valid_from_dttm, valid_to_dttm
-    FROM PP.temp;
+    FROM PP.TMP_PRIVILEGES;
 
     -- Очищаем SAT_PRIVILEGES и заполняем его новыми данными
     DELETE FROM PP.SAT_PRIVILEGES WHERE true;
 
     INSERT INTO PP.SAT_PRIVILEGES
     SELECT *
-    FROM PP.temp;
+    FROM PP.TMP_PRIVILEGES;
 
 END;

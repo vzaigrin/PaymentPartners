@@ -1,0 +1,7 @@
+.gcloudignore
+.idea
+.vscode
+cmd
+data-load.iml
+LoadDicts.sh
+LoadData.sh
