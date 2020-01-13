@@ -82,8 +82,6 @@ CREATE TABLE PP.ODS_PARTNERS (
 DROP TABLE IF EXISTS PP.ODS_BINS;
 CREATE TABLE PP.ODS_BINS (
     bin                         STRING NOT NULL
-    , range_from                STRING NOT NULL
-    , range_to                  STRING NOT NULL
     , bank                      STRING NOT NULL
     , card_type                 STRING NOT NULL
 );
@@ -184,6 +182,53 @@ CREATE TABLE PP.SAT_DATA (
     , payment_partner           FLOAT64 NOT NULL
     , payment_other_client      FLOAT64 NOT NULL
     , processed_dttm            TIMESTAMP NOT NULL
+    , _hash                     BYTES NOT NULL
+);
+
+DROP TABLE IF EXISTS PP.TMP_DATA;
+CREATE TABLE PP.TMP_DATA (
+    data_id                     STRING NOT NULL
+    , card_number               STRING NOT NULL
+    , operation_ts              TIMESTAMP NOT NULL
+    , period_year               INT64 NOT NULL
+    , period_month              INT64 NOT NULL
+    , period_name               STRING NOT NULL
+    , operation_country         STRING NOT NULL
+    , operation_city            STRING NOT NULL
+    , payment_total             FLOAT64 NOT NULL
+    , payment_tariff            FLOAT64 NOT NULL
+    , payment_main_client       FLOAT64 NOT NULL
+    , payment_ps                FLOAT64 NOT NULL
+    , payment_partner           FLOAT64 NOT NULL
+    , payment_other_client      FLOAT64 NOT NULL
+    , processed_dttm            TIMESTAMP NOT NULL
+    , partner_id                STRING NOT NULL
+    , bin_id                    STRING NOT NULL
+    , privilege_id              STRING NOT NULL
+    , _hash                     BYTES NOT NULL
+);
+
+DROP TABLE IF EXISTS PP.TMP_DATA_2;
+CREATE TABLE PP.TMP_DATA_2 (
+    data_id                     STRING NOT NULL
+    , card_number               STRING NOT NULL
+    , operation_ts              TIMESTAMP NOT NULL
+    , period_year               INT64 NOT NULL
+    , period_month              INT64 NOT NULL
+    , period_name               STRING NOT NULL
+    , operation_country         STRING NOT NULL
+    , operation_city            STRING NOT NULL
+    , payment_total             FLOAT64 NOT NULL
+    , payment_tariff            FLOAT64 NOT NULL
+    , payment_main_client       FLOAT64 NOT NULL
+    , payment_ps                FLOAT64 NOT NULL
+    , payment_partner           FLOAT64 NOT NULL
+    , payment_other_client      FLOAT64 NOT NULL
+    , processed_dttm            TIMESTAMP NOT NULL
+    , partner_id                STRING NOT NULL
+    , bin_id                    STRING NOT NULL
+    , privilege_id              STRING NOT NULL
+    , _hash                     BYTES NOT NULL
 );
 
 DROP TABLE IF EXISTS PP.LNK_DATA_PARTNERS;
@@ -249,8 +294,6 @@ DROP TABLE IF EXISTS PP.SAT_BINS;
 CREATE TABLE PP.SAT_BINS (
     bin_id                      STRING NOT NULL
     , bin                       STRING NOT NULL
-    , range_from                STRING NOT NULL
-    , range_to                  STRING NOT NULL
     , bank                      STRING NOT NULL
     , card_type                 STRING NOT NULL
     , processed_dttm            TIMESTAMP NOT NULL
@@ -263,8 +306,6 @@ DROP TABLE IF EXISTS PP.TMP_BINS;
 CREATE TABLE PP.TMP_BINS (
     bin_id                      STRING NOT NULL
     , bin                       STRING NOT NULL
-    , range_from                STRING NOT NULL
-    , range_to                  STRING NOT NULL
     , bank                      STRING NOT NULL
     , card_type                 STRING NOT NULL
     , processed_dttm            TIMESTAMP NOT NULL
@@ -314,8 +355,9 @@ CREATE TABLE PP.DM_LOADS (
     , period_month              INT64 NOT NULL
     , filename                  STRING NOT NULL
     , load_ts                   TIMESTAMP NOT NULL
-    , total                     INT64
-    , good                      INT64
+    , stg                       INT64
+    , ods                       INT64
+    , dds                       INT64
     , bad                       INT64
 );
 
@@ -326,8 +368,9 @@ SELECT
     , period_month
     , filename
     , load_ts
-    , total
-    , good
+    , stg
+    , ods
+    , dds
     , bad
 FROM `my-project-1530001957977.PP.DM_LOADS` p
 WHERE upper(p.partner_name) = 'TAXI'
@@ -340,8 +383,9 @@ SELECT
     , period_month
     , filename
     , load_ts
-    , total
-    , good
+    , stg
+    , ods
+    , dds
     , bad
 FROM `my-project-1530001957977.PP.DM_LOADS` p
 WHERE upper(p.partner_name) = 'TELECOM'
@@ -354,8 +398,9 @@ SELECT
     , period_month
     , filename
     , load_ts
-    , total
-    , good
+    , stg
+    , ods
+    , dds
     , bad
 FROM `my-project-1530001957977.PP.DM_LOADS` p
 WHERE upper(p.partner_name) = 'CINEMA'
@@ -368,8 +413,9 @@ SELECT
     , period_month
     , filename
     , load_ts
-    , total
-    , good
+    , stg
+    , ods
+    , dds
     , bad
 FROM `my-project-1530001957977.PP.DM_LOADS` p
 WHERE upper(p.partner_name) = 'RETAIL'

@@ -4,7 +4,6 @@ import (
     "context"
     "fmt"
     "io/ioutil"
-    "log"
     "os"
     "path/filepath"
     "pp"
@@ -36,7 +35,7 @@ func main() {
     // Читаем базовый каталог
     dirs, err := ioutil.ReadDir(basedir)
     if err != nil {
-        fmt.Printf("Error reading #{basedir}: #{err}\n")
+        fmt.Printf("Error reading %v: %v\n", basedir, err)
         os.Exit(-1)
     }
 
@@ -48,7 +47,7 @@ func main() {
             // Читаем содержимое папки
             files, err := ioutil.ReadDir(basedir + "/" + d.Name())
             if err != nil {
-                fmt.Printf("Error reading partner's folder #{basedir}/#{d.Name()}: #{err}\n")
+                fmt.Printf("Error reading partner's folder %v/%v: %v\n", basedir, d.Name(), err)
                 continue
             }
 
@@ -67,7 +66,7 @@ func main() {
                     // Загружаем файл в области Stage
                     err := pp.LoadFileToTable(ctx, projectID, datasetID, "STG_" + tableID, filename)
                     if err != nil {
-                        log.Printf("Error loading file #{filename} into table STG_#{tableID}: #{err}")
+                        fmt.Printf("Error loading file %v into table STG_%v: %v\n", filename, tableID, err)
                         continue
                     }
 
@@ -76,7 +75,7 @@ func main() {
                     query := "CALL " + datasetID + ".LOAD_" + tableID + "('" + f.Name() + "', " + year + ", " + num + ");"
                     err = pp.RunQuery(ctx, projectID, query)
                     if err != nil {
-                        log.Printf("Error running query '#{query}': #{err}")
+                        fmt.Printf("Error running query '%v': %v\n", query, err)
                         continue
                     }
                 }

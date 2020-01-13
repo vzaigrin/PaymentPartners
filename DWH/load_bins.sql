@@ -9,8 +9,6 @@ BEGIN
     INSERT INTO PP.ODS_BINS
     SELECT DISTINCT
         CAST(bin AS STRING) AS bin
-        , CAST(range_from AS STRING) AS range_from
-        , CAST(range_to AS STRING) AS range_to
         , bank
         , card_type
     FROM PP.STG_BINS;
@@ -25,8 +23,6 @@ BEGIN
     SELECT
     COALESCE(s.bin_id, o.bin_id) AS bin_id
     , COALESCE(s.bin, o.bin) AS bin
-    , COALESCE(s.range_from, o.range_from) AS range_from
-    , COALESCE(s.range_to, o.range_to) AS range_to
     , COALESCE(s.bank, o.bank) AS bank
     , COALESCE(s.card_type, o.card_type) AS card_type
     , COALESCE(s.processed_dttm, o.processed_dttm) AS processed_dttm
@@ -41,12 +37,10 @@ BEGIN
     SELECT
         GENERATE_UUID() AS bin_id
         , bin
-        , range_from
-        , range_to
         , bank
         , card_type
         , CURRENT_TIMESTAMP AS processed_dttm
-        , MD5(CONCAT(bin, range_from, range_to)) AS _hash
+        , MD5(bin) AS _hash
     FROM PP.ODS_BINS
     ) o
     FULL JOIN PP.SAT_BINS s
