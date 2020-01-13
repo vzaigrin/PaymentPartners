@@ -7,11 +7,20 @@ BEGIN
 
     -- Перегружаем данные о bins из области Srange_frome в область ODS
     INSERT INTO PP.ODS_BINS
-    SELECT DISTINCT
+    SELECT
+    bin
+    , bank
+    , card_type
+    FROM (
+    SELECT
         CAST(bin AS STRING) AS bin
         , bank
         , card_type
-    FROM PP.STG_BINS;
+        , ROW_NUMBER() OVER (PARTITION BY bin ORDER BY bin DESC) AS row_num
+    FROM PP.STG_BINS
+    ) b
+    WHERE b.row_num = 1
+    ;
 
     -- Очищаем TMP_BINS
     DELETE FROM PP.TMP_BINS WHERE true;
