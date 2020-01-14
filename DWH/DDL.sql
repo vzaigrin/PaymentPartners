@@ -431,7 +431,6 @@ CREATE TABLE PP.DM_REPORT (
     , operation_country         STRING NOT NULL
     , operation_city            STRING NOT NULL
     , privilege_type            STRING NOT NULL
-    , purchase_type             STRING NOT NULL
     , partner_class             STRING NOT NULL
     , period_name               STRING NOT NULL
     , period_year               INT64 NOT NULL
@@ -483,21 +482,6 @@ SELECT
 FROM `my-project-1530001957977.PP.DM_REPORT` p
 GROUP BY partner_name, operation_city, operation_day, period_name
 ORDER BY partner_name, operation_city, operation_day, period_name
-;
-
-CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_PURCHASE` AS
-SELECT
-    sum(trans_num) AS sum_opers
-    , sum(payment_total) AS sum_total
-    , sum(payment_ps) AS sum_ps
-    , avg(payment_total) AS avg_total
-    , partner_name
-    , purchase_type
-    , operation_day
-    , period_name
-FROM `my-project-1530001957977.PP.DM_REPORT` p
-GROUP BY partner_name, purchase_type, operation_day, period_name
-ORDER BY partner_name, purchase_type, operation_day, period_name
 ;
 
 CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_PRIVILEGE` AS
@@ -558,19 +542,6 @@ FROM `my-project-1530001957977.PP.V_DM_CITY` p
 WHERE upper(p.partner_name) = 'TAXI'
 ;
 
-CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_PURCHASE_TAXI` AS
-SELECT
-    sum_opers
-    , sum_total
-    , sum_ps
-    , avg_total
-    , purchase_type
-    , operation_day
-    , period_name
-FROM `my-project-1530001957977.PP.V_DM_PURCHASE` p
-WHERE upper(p.partner_name) = 'TAXI'
-;
-
 CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_PRIVILEGE_TAXI` AS
 SELECT
     sum_opers
@@ -622,19 +593,6 @@ SELECT
     , operation_day
     , period_name
 FROM `my-project-1530001957977.PP.V_DM_CITY` p
-WHERE upper(p.partner_name) = 'TELECOM'
-;
-
-CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_PURCHASE_TELECOM` AS
-SELECT
-    sum_opers
-    , sum_total
-    , sum_ps
-    , avg_total
-    , purchase_type
-    , operation_day
-    , period_name
-FROM `my-project-1530001957977.PP.V_DM_PURCHASE` p
 WHERE upper(p.partner_name) = 'TELECOM'
 ;
 
@@ -692,19 +650,6 @@ FROM `my-project-1530001957977.PP.V_DM_CITY` p
 WHERE upper(p.partner_name) = 'CINEMA'
 ;
 
-CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_PURCHASE_CINEMA` AS
-SELECT
-    sum_opers
-    , sum_total
-    , sum_ps
-    , avg_total
-    , purchase_type
-    , operation_day
-    , period_name
-FROM `my-project-1530001957977.PP.V_DM_PURCHASE` p
-WHERE upper(p.partner_name) = 'CINEMA'
-;
-
 CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_PRIVILEGE_CINEMA` AS
 SELECT
     sum_opers
@@ -756,19 +701,6 @@ SELECT
     , operation_day
     , period_name
 FROM `my-project-1530001957977.PP.V_DM_CITY` p
-WHERE upper(p.partner_name) = 'RETAIL'
-;
-
-CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_PURCHASE_RETAIL` AS
-SELECT
-    sum_opers
-    , sum_total
-    , sum_ps
-    , avg_total
-    , purchase_type
-    , operation_day
-    , period_name
-FROM `my-project-1530001957977.PP.V_DM_PURCHASE` p
 WHERE upper(p.partner_name) = 'RETAIL'
 ;
 
