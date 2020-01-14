@@ -2,6 +2,10 @@
 CREATE OR REPLACE PROCEDURE PP.DATA2DM (pyear INT64, pmonth INT64)
 BEGIN
 
+    -- Удаляем предыдущую версию отчёта, чтобы не было дубликатов
+    DELETE FROM PP.DM_REPORT WHERE period_year = pyear AND period_month = pmonth;
+
+    -- Добавляем новые записи
     INSERT INTO PP.DM_REPORT
     SELECT
         partner_name

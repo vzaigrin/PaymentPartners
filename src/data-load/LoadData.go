@@ -22,6 +22,7 @@ func LoadData(ctx context.Context, m PubSubMessage) error {
 	name := string(m.Data)
 	log.Printf("Processing message: %v", name)
 	if name != "go" {
+		log.Printf("This is not a message to process")
 		return nil
 	}
 
@@ -29,6 +30,10 @@ func LoadData(ctx context.Context, m PubSubMessage) error {
 	projectID := os.Getenv("GCP_PROJECT")
 	datasetID := "PP"
 	bucket := "pps"
+
+	// Вычисляем предыдущий месяц по текущей дате
+	time1 := time.Now().AddDate(0, -1, 0)
+	year, month, _ := time1.Date()
 
 	// Создаём клинта для Storage
 	client, err := storage.NewClient(ctx)
@@ -67,17 +72,13 @@ func LoadData(ctx context.Context, m PubSubMessage) error {
 		}
 
 		// Загружаем файл в таблицу в области Stage, перезаписывая её
-		err = LoadFileToTable(ctx, projectID, datasetID, "STG_"+tableID, "gs://" + bucket + "/" + attrs.Name)
+		err = LoadFileToTable(ctx, projectID, datasetID, "STG_"+tableID, "gs://"+bucket+"/"+attrs.Name)
 		if err != nil {
 			log.Printf("Error loading file %v into table 'STG_%v': %v", attrs.Name, tableID, err)
 			return err
 		}
 
 		// Если файл загружен успешно в область Stage, то вызываем процедуру для перегрузки данных в области ODS и DDS
-		// Вычисляем предыдущий месяц по текущей дате
-		time1 := time.Now().AddDate(0, -1, 0)
-		year, month, _ := time1.Date()
-
 		query := "CALL " + datasetID + ".LOAD_" + tableID + "('" + fileName + "'," + strconv.Itoa(year) + ", " + strconv.Itoa(int(month)) + ");"
 		err = RunQuery(ctx, projectID, query)
 		if err != nil {
@@ -91,6 +92,14 @@ func LoadData(ctx context.Context, m PubSubMessage) error {
 			log.Printf("Error deleting file %v: %v", attrs.Name, err)
 			return err
 		}
+	}
+
+	// Вызываем процедуру формирования отчёта
+	query := "CALL " + datasetID + ".DATA2DM(" + strconv.Itoa(year) + ", " + strconv.Itoa(int(month)) + ");"
+	err = RunQuery(ctx, projectID, query)
+	if err != nil {
+		log.Printf("Error running query '%v': %v", query, err)
+		return err
 	}
 
 	// Закрываем клиента и выходим
