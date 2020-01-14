@@ -174,6 +174,13 @@
     "Генерируем случайное число в заданном интервале"
     (+ from (random (1+ to))))
 
+(defun get-file (filename)
+    "Читаем файл, возвращаем список"
+    (with-open-file (stream filename)
+        (loop for line = (read-line stream nil)
+            while line
+            collect line)))
+
 (defun field2value (field year month error)
     "Генерируем значение по описанию поля"
     (cond
@@ -242,7 +249,25 @@
             (exit-error "Неправильный формат шаблона. Нет имени поля"))
         (if (some #'(lambda (x) (eq (field-type x) "")) fields)
             (exit-error "Неправильный формат шаблона. Нет типа поля"))
-        ;;; Выводим результат в файл
+        ;; Если поле содержит имя файл со списком, заменяем его на список из файла
+        (setf fields
+            (mapcar #'(lambda (x)
+                (if (eq (car (field-values x)) :LIST-FILE)
+                    (make-field
+                        :name (field-name x)
+                        :type (field-type x)
+                        :length (field-length x)
+                        :nullable (field-nullable x)
+                        :values
+                            (cons :LIST
+                                (get-file
+                                    (concatenate 'string
+                                        (directory-namestring
+                                            (truename (parameters-templ-file params)))
+                                        (cdr (field-values x))))))
+                    x))
+                fields))
+        ;; Выводим результат в файл
         (with-open-file
             (f (parameters-data-file params)
                 :direction :output
@@ -257,7 +282,8 @@
                         (field2value x
                             (parameters-year params)
                             (parameters-month params)
-                            (parameters-errors params))) fields)))))))
+                            (parameters-errors params)))
+                        fields)))))))
 
 ;;; Компилируем и выходим
 (sb-ext:save-lisp-and-die "data-gen" :toplevel #'main :executable t)

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 basedir=../../data/2019
-for file in templates/*
+for file in templates/*.json
 do
     partner=`basename ${file} .json`
     mkdir -p $basedir/$partner

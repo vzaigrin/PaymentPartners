@@ -13,9 +13,9 @@
     },
     {
       "name": "bin_number",
-      "type": "INT64",
+      "type": "STRING",
       "values": {
-        "range": [400000, 499999]
+        "list-file": "bins.csv"
       }
     },
     {
