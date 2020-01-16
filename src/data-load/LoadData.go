@@ -67,7 +67,7 @@ func LoadData(ctx context.Context, m PubSubMessage) error {
 
 		// Загрузаем только файлы CSV
 		splitFile := strings.Split(fileName, ".")
-		if len(splitFile) < 2 && strings.ToUpper(splitFile[1]) != "CSV" {
+		if len(splitFile) < 2 || strings.ToUpper(splitFile[1]) != "CSV" {
 			continue
 		}
 
