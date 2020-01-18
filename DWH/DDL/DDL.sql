@@ -385,19 +385,6 @@ CREATE TABLE PP.DM_REPORT (
     , trans_num                 INT64 NOT NULL
 );
 
-CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_CARD` AS
-SELECT
-    sum(trans_num) AS sum_opers
-    , avg(payment_total) AS avg_total
-    , partner_name
-    , card_type
-    , operation_day
-    , period_name
-FROM `my-project-1530001957977.PP.DM_REPORT` p
-GROUP BY partner_name, card_type, operation_day, period_name
-ORDER BY partner_name, card_type, operation_day, period_name
-;
-
 CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_BANK` AS
 SELECT
     sum(trans_num) AS sum_opers
@@ -406,9 +393,28 @@ SELECT
     , bank
     , operation_day
     , period_name
+    , period_year
+    , period_month
+    , week_num
 FROM `my-project-1530001957977.PP.DM_REPORT` p
-GROUP BY partner_name, bank, operation_day, period_name
-ORDER BY partner_name, bank, operation_day, period_name
+GROUP BY partner_name, bank, operation_day, period_name, period_year, period_month, week_num
+ORDER BY partner_name, bank, operation_day, period_name, period_year, period_month, week_num
+;
+
+CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_CARD` AS
+SELECT
+    sum(trans_num) AS sum_opers
+    , avg(payment_total) AS avg_total
+    , partner_name
+    , card_type
+    , operation_day
+    , period_name
+    , period_year
+    , period_month
+    , week_num
+FROM `my-project-1530001957977.PP.DM_REPORT` p
+GROUP BY partner_name, card_type, operation_day, period_name, period_year, period_month, week_num
+ORDER BY partner_name, card_type, operation_day, period_name, period_year, period_month, week_num
 ;
 
 CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_CITY` AS
@@ -419,9 +425,28 @@ SELECT
     , operation_city
     , operation_day
     , period_name
+    , period_year
+    , period_month
+    , week_num
 FROM `my-project-1530001957977.PP.DM_REPORT` p
-GROUP BY partner_name, operation_city, operation_day, period_name
-ORDER BY partner_name, operation_city, operation_day, period_name
+GROUP BY partner_name, operation_city, operation_day, period_name, period_year, period_month, week_num
+ORDER BY partner_name, operation_city, operation_day, period_name, period_year, period_month, week_num
+;
+
+CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_COUNTRY` AS
+SELECT
+    sum(trans_num) AS sum_opers
+    , avg(payment_total) AS avg_total
+    , partner_name
+    , operation_country
+    , operation_day
+    , period_name
+    , period_year
+    , period_month
+    , week_num
+FROM `my-project-1530001957977.PP.DM_REPORT` p
+GROUP BY partner_name, operation_country, operation_day, period_name, period_year, period_month, week_num
+ORDER BY partner_name, operation_country, operation_day, period_name, period_year, period_month, week_num
 ;
 
 CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_PRIVILEGE` AS
@@ -431,20 +456,26 @@ SELECT
     , privilege_type
     , operation_day
     , period_name
+    , period_year
+    , period_month
+    , week_num
 FROM `my-project-1530001957977.PP.DM_REPORT` p
-GROUP BY partner_name, privilege_type, operation_day, period_name
-ORDER BY partner_name, privilege_type, operation_day, period_name
+GROUP BY partner_name, privilege_type, operation_day, period_name, period_year, period_month, week_num
+ORDER BY partner_name, privilege_type, operation_day, period_name, period_year, period_month, week_num
 ;
 
 CREATE OR REPLACE VIEW `my-project-1530001957977.PP.V_DM_PAYMENT` AS
 SELECT
     avg(payment_main_client) AS avg_client
-    , avg(payment_ps) AS ps
+    , avg(payment_ps) AS avg_ps
     , avg(payment_partner) AS avg_partner
     , partner_name
     , operation_day
     , period_name
+    , period_year
+    , period_month
+    , week_num
 FROM `my-project-1530001957977.PP.DM_REPORT` p
-GROUP BY partner_name, operation_day, period_name
-ORDER BY partner_name, operation_day, period_name
+GROUP BY partner_name, operation_day, period_name, period_year, period_month, week_num
+ORDER BY partner_name, operation_day, period_name, period_year, period_month, week_num
 ;

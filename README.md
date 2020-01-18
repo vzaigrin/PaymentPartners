@@ -11,10 +11,10 @@
 Отчётным периодом в системе является календарный месяц. Приём информации от партнёров по отчётному периоду длится в течение периода сбора, который начинается в первый день месяца, следующего за отчётным периодом, и длится в течение 15 дней. По истечении периода сбора расчётный период закрывается и блокируется, становясь недоступным для внесения в него каких-либо изменений. По итогам закрытия расчётного периода осуществляется формирование отчётности.
 
 Список партнёров может меняться. Исходный список партнёров:
-- Taxi
-- Telecom
 - Cinema
 - Retail
+- Taxi
+- Telecom
 
 ## Архитектура
 ...
@@ -35,16 +35,17 @@
 
 #### Stage
 Справочники могут быть сразу созданы в детальном слое. Но так как они могут измениться, они подаются в систему в виде файлов и проходят все этапы обработки.
-Справочники загружаются в область dicts. Партнёры загружают реестры в виде файлов в область inbox в папку со своим именем.
+
+Справочники загружаются в область *dicts*. Партнёры загружают реестры в виде файлов в область *inbox* в папку со своим именем.
 
 Входящие файлы без изменений попадают в область Stage:
 - STG_PARTNERS - справочник партёров
 - STG_BINS - справочник Bins (первые 6 цифр карт)
 - STG_PRIVILEGES - справочник привелегий
-- STG_TAXI - данные партнёра Taxi
-- STG_TELECOM - данные партнёра Telecom
 - STG_CINEMA - данные партнёра Cinema
 - STG_RETAIL - данные партнёра Retail
+- STG_TAXI - данные партнёра Taxi
+- STG_TELECOM - данные партнёра Telecom
 
 #### ODS
 Справочники очищаются и перегружаются в область ODS сразу после загрузки в область Stage:
@@ -54,10 +55,10 @@
 
 Реестры (данные, загружаемые партнёрами) перегружаются в область ODS по окончании периода сбора данных (16-го числа следующего месяца).
 Реестры проверяются и очищаются. Перегружаются только корректные записи отчётного периода:
-- ODS_TAXI - данные партнёра Taxi
-- ODS_TELECOM - данные партнёра Telecom
 - ODS_CINEMA - данные партнёра Cinema
 - ODS_RETAIL - данные партнёра Retail
+- ODS_TAXI - данные партнёра Taxi
+- ODS_TELECOM - данные партнёра Telecom
 
 #### DDS
 Данные из области ODS приводятся к единому формату и перегружаются в область DDS:
@@ -92,17 +93,17 @@
 - LOAD_PARTNERS() - загрузка данных о партнёрах в слой DDS
 - LOAD_BINS() - загрузка данных о bins в слой DDS
 - LOAD_PRIVILEGE() - загрузка данных о привилегиях в слой DDS
-- LOAD_TAXI() - загрузка данных партнёра Taxi во временные таблицы слоя DDS
-- LOAD_TELECOM() - загрузка данных партнёра Telecom во временные таблицы слоя DDS
 - LOAD_CINEMA() - загрузка данных партнёра Cinema во временные таблицы слоя DDS
 - LOAD_RETAIL() - загрузка данных партнёра Retail во временные таблицы слоя DDS
+- LOAD_TAXI() - загрузка данных партнёра Taxi во временные таблицы слоя DDS
+- LOAD_TELECOM() - загрузка данных партнёра Telecom во временные таблицы слоя DDS
 - LOAD_DATA() - перегрузка данных из временных таблиц в слой DDS
 - DATA2DM() - заполнение витрины слоя DM отчётом за конкретный период
 
-Таблицы и процедуры создаются в наборе данных PP.
+Таблицы и процедуры создаются в наборе данных *PP*.
 
 #### Наборы данных для партнёров
-Так как разграничение доступа к данным в BigQuery осуществляется на уровне наборов данных, для каждого партнёра создаётся свой набор данных с названием, совпадающем с именем партнёра. Эти наборы содержат представления (View) с витринами, содержащие данные только одного партнёра.
+Так как разграничение доступа к данным в BigQuery осуществляется на уровне наборов данных, для каждого партнёра создаётся свой набор данных с названием, совпадающем с именем партнёра. Эти наборы содержат представления (View) с витринами, содержащие данные только этого партнёра.
 
 Для единообразия витрины называются одинаково:
 - V_DM_LOADS - отчёты о загрузках данных
@@ -167,20 +168,50 @@
 По витринам слоя DM построены отчёты в Data Studio:
 - [Загрузки](https://datastudio.google.com/reporting/0647ce66-575e-425f-b565-9bd6f15be617)
 - [Регионы](https://datastudio.google.com/reporting/0ad44459-d2a3-479b-82a1-e2c68d530653)
+- [Банки](https://datastudio.google.com/reporting/572e7340-116f-43d3-a726-403ac57c1c2d)
+- [Карты](https://datastudio.google.com/reporting/12c1d2ae-fc93-45f3-ada7-742a51e27da1)
+- [Города](https://datastudio.google.com/reporting/8ed4a56d-b71d-4d50-8509-c2293b9db467)
+- [Страны](https://datastudio.google.com/reporting/ca54084c-bc3b-4c6d-a674-5ab7b5d1bf34)
+- [Привелегии](https://datastudio.google.com/reporting/85b47b60-36c5-465a-96aa-154e2c9be091)
+- [Средний чек](https://datastudio.google.com/reporting/6f6e728e-a195-4b9b-b80b-596a728c4f66)
 
 Для каждого партнёра построен свой набор отчётов:
 
 ### Cinema
 - [Загрузки](https://datastudio.google.com/reporting/032d3d19-77ed-4370-9a26-788d672c97c4)
+- [Банки](https://datastudio.google.com/reporting/49d5b7ad-bed0-41fc-a3e9-ad3498c42272)
+- [Карты](https://datastudio.google.com/reporting/6ca1183a-cfef-4957-9c4a-7888de31ffcf)
+- [Города](https://datastudio.google.com/reporting/607841d0-28f1-43c3-a97d-dbbabb0dc2a4)
+- [Страны](https://datastudio.google.com/reporting/e3bd37cd-09f6-4510-898d-62f3d349d383)
+- [Привелегии](https://datastudio.google.com/reporting/78a8f95e-7ea9-490d-894b-5b4eea18fe82)
+- [Средний чек](https://datastudio.google.com/reporting/928909d6-c8a7-4d09-a519-f29e7ed2f100)
 
 ### Retail
 - [Загрузки](https://datastudio.google.com/reporting/9fea0417-17e3-4f14-b69f-aaf08f1623af)
+- [Банки](https://datastudio.google.com/reporting/407cd00a-58fb-4dee-8010-2ba28d765013)
+- [Карты](https://datastudio.google.com/reporting/6bb276d9-1065-41c4-b4ee-36d4ccd9a940)
+- [Города](https://datastudio.google.com/reporting/9b52b563-db63-4be0-b75c-cca893785594)
+- [Страны](https://datastudio.google.com/reporting/b667819c-3a2b-44fc-b2f0-516d67a82547)
+- [Привелегии](https://datastudio.google.com/reporting/4d1a24fb-0836-4cd5-864a-6a7a57f16082)
+- [Средний чек](https://datastudio.google.com/reporting/f90f0636-8cae-40e7-a379-82e1eb8030d9)
 
 ### Taxi
 - [Загрузки](https://datastudio.google.com/reporting/9788609e-b4c1-46a4-b4c6-a6ce53390d0c)
+- [Банки](https://datastudio.google.com/reporting/e2c59c94-9975-4a8b-b4f4-de5672ef0572)
+- [Карты](https://datastudio.google.com/reporting/d3945008-cd45-441d-aed4-c6e40e03614a)
+- [Города](https://datastudio.google.com/reporting/0a649947-f3a2-4b67-ae08-8c6240d1f24e)
+- [Страны](https://datastudio.google.com/reporting/4a5571cb-6bd6-48d7-8953-6bb2f8d95e8c)
+- [Привелегии](https://datastudio.google.com/reporting/910297ec-0620-4e77-aec3-96688bdf8286)
+- [Средний чек](https://datastudio.google.com/reporting/c695183a-3ce2-40c2-b52f-6476ad9bdab6)
 
 ### Telecom
 - [Загрузки](https://datastudio.google.com/reporting/39b856c2-b223-416c-a23f-a2dcb3643f09)
+- [Банки](https://datastudio.google.com/reporting/e6b97f5e-c108-4db0-a279-3fb17cb25245)
+- [Карты](https://datastudio.google.com/reporting/d244b8c2-d561-474a-9b08-cc58dea77dfe)
+- [Города](https://datastudio.google.com/reporting/281102db-2cb4-4d57-b2c7-eceaab2395a8)
+- [Страны](https://datastudio.google.com/reporting/6af673f3-d100-4ac3-9bf5-bd2311060057)
+- [Привелегии](https://datastudio.google.com/reporting/196ae809-4885-47ca-bb5b-42f6320978c8)
+- [Средний чек](https://datastudio.google.com/reporting/d1691113-7ef5-40a6-92d2-31d4be2292fc)
 
 ## Развитие
 Для полноты реализации в систему планируется добавить пользовательское приложение в виде web-сервиса для загрузки данных и просмотров отчётов.
