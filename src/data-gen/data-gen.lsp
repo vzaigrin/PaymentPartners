@@ -24,7 +24,8 @@
 
 (defun exit-error (&optional (e nil))
     "Вывод сообщения об ошибке и завершение работы."
-    (if e (format t "Ошибка: ~a~%~%" e)))
+    (if e (format t "Ошибка: ~a~%~%" e))
+    (quit))
 
 ;;; Структура для параметров
 (defstruct parameters
