@@ -38,9 +38,7 @@
 
 (defun string-integer-p (str)
     "Проверка, что строка может быть конвертирована в целое число"
-    (every #'(lambda (x)
-        (member x (list #\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9)))
-        str))
+    (every #'digit-char-p str))
 
 (defun parse-args (args params)
     "Разбор аргументов коммандной строки. Возвращает структуру с параметрами"
