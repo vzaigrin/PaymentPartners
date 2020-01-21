@@ -107,9 +107,9 @@
                 (with-open-file (stream path) (json:decode-json stream))
                 (json:json-syntax-error ()
                     (exit-error (format nil "JSON Syntax Error при чтении файла шаблона ~s" path))))))
-        (handler-case (check-type result sequence)
-            (SIMPLE-TYPE-ERROR () (exit-error (format nil "Неправильный формат файла шаблона ~s" path))))
-        result))
+        (if (typep result 'sequence)
+            result
+            (exit-error (format nil "Неправильный формат файла шаблона ~s" path)))))
 
 ;;; Структура для описания полей данных
 (defstruct field
