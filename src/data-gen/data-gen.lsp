@@ -102,7 +102,14 @@
 
 (defun decode-file (path)
     "Декодирование JSON файла"
-    (with-open-file (stream path) (json:decode-json stream)))
+    (let ((result 
+            (handler-case
+                (with-open-file (stream path) (json:decode-json stream))
+                (json:json-syntax-error ()
+                    (exit-error (format nil "JSON Syntax Error при чтении файла шаблона ~s" path))))))
+        (handler-case (check-type result sequence)
+            (SIMPLE-TYPE-ERROR () (exit-error (format nil "Неправильный формат файла шаблона ~s" path))))
+        result))
 
 ;;; Структура для описания полей данных
 (defstruct field
@@ -135,21 +142,18 @@
                 (t (string (car lst))))
             (list2string (cdr lst) sep t)))))
 
-(defun days-in-month (month)
-    "Возвращаем количество дней в месяце по его номеру без учёта високосный год или нет"
-    (cond
-        ((eq month 1) 31)
-        ((eq month 2) 28)
-        ((eq month 3) 31)
-        ((eq month 4) 30)
-        ((eq month 5) 31)
-        ((eq month 6) 30)
-        ((eq month 7) 31)
-        ((eq month 8) 31)
-        ((eq month 9) 30)
-        ((eq month 10) 31)
-        ((eq month 11) 30)
-        ((eq month 12) 31)))
+(defun leap-year-p (year)
+   "Определяем високосный год или нет"
+    (and (zerop (mod year 4))
+        (or (zerop (mod year 400))
+            (not (zerop (mod year 100))))))
+
+(defun days-in-month (year month)
+    "Возвращаем количество дней в месяце по его номеру и году"
+    (case month
+        ((1 3 5 7 8 10 12) 31)
+        ((4 6 9 11) 30)
+        (2 (if (leap-year-p year) 29 28))))
 
 (defun gen-timestamp (year month error)
     "Генерируем timestamp по году и месяцу с error процентом ошибок"
@@ -159,7 +163,7 @@
             (format nil "~4,'0d" (1+ year)))
         "-"
         (format nil "~2,'0d" month) "-"
-        (format nil "~2,'0d" (1+ (random (days-in-month month))))
+        (format nil "~2,'0d" (1+ (random (days-in-month year month))))
         " "
         (format nil "~2,'0d" (random 24)) ":"
         (format nil "~2,'0d" (random 60)) ":"
