@@ -1,5 +1,5 @@
 -- Процедура заполнения таблиц в областях ODS и DDS после заполнения таблицы в области Stage
-CREATE OR REPLACE PROCEDURE PP.LOAD_CINEMA (fname STRING, pyear INT64, pmonth INT64)
+CREATE OR REPLACE PROCEDURE PP.LOAD_RETAIL (fname STRING, pyear INT64, pmonth INT64)
 BEGIN
 
     DECLARE loadts TIMESTAMP;
@@ -8,29 +8,32 @@ BEGIN
     DECLARE dds INT64;
 
     SET loadts = CURRENT_TIMESTAMP;
+    SET stg = (SELECT count(*) FROM PP.STG_RETAIL);
 
     -- Очищаем таблицу с данными в области ODS
-    DELETE FROM PP.ODS_CINEMA WHERE true;
+    DELETE FROM PP.ODS_RETAIL WHERE true;
 
     -- Перегружаем данные из области Srange_frome в область ODS
     -- Добавляем имя файла и время обработки, удаляем некорректные данные
-    INSERT INTO PP.ODS_CINEMA
+    INSERT INTO PP.ODS_RETAIL
     SELECT DISTINCT
-        cinema_name
-        , trans_time
-        , discount_type
-        , base_price
-        , discount
-        , film
-        , CAST(rrn AS STRING) AS rrn
+        CAST(order_id AS STRING) AS order_id
+        , CAST(card_bin AS STRING) AS card_bin
         , CAST(card_number AS STRING) AS card_number
+        , bill_date
+        , COALESCE(transaction_amount, 0.0)
+        , COALESCE(ps_financing, 0.0)
+        , COALESCE(partner_financing, 0.0)
+        , location
         , pyear AS period_year
         , pmonth AS period_month
         , fname AS filename
         , loadts AS load_ts
-    FROM PP.STG_CINEMA
-    WHERE trans_time BETWEEN TIMESTAMP(DATE(pyear, pmonth, 1)) AND TIMESTAMP(DATE_ADD(DATE(pyear, pmonth, 1), INTERVAL 1 MONTH))
+    FROM PP.STG_RETAIL
+    WHERE bill_date BETWEEN TIMESTAMP(DATE(pyear, pmonth, 1)) AND TIMESTAMP(DATE_ADD(DATE(pyear, pmonth, 1), INTERVAL 1 MONTH))
     ;
+
+    SET ods = (SELECT count(*) FROM PP.ODS_RETAIL);
 
     -- Очищаем TMP_DATA
     DELETE FROM PP.TMP_DATA WHERE true;
@@ -63,25 +66,25 @@ BEGIN
             CAST(payment_ps AS STRING), CAST(payment_partner AS STRING), CAST(payment_other_client AS STRING))) AS _hash
     FROM (
         SELECT
-            rrn AS bin
+            card_bin AS bin
             , card_number AS card_number
-            , trans_time AS operation_ts
+            , bill_date AS operation_ts
             , pyear AS period_year
             , pmonth AS period_month
             , FORMAT("%4d-%02d", pyear, pmonth) AS period_name
             , 'Россия' AS operation_country
-            , 'Москва' AS operation_city
-            , base_price AS payment_total
-            , base_price AS payment_tariff
-            , base_price * (1 - (discount / 100.0)) AS payment_main_client
-            , base_price * (discount / 100.0) AS payment_ps
-            , 0 AS payment_partner
+            , location AS operation_city
+            , transaction_amount AS payment_total
+            , transaction_amount AS payment_tariff
+            , transaction_amount * (1 - (ps_financing + partner_financing) / 100.0) AS payment_main_client
+            , transaction_amount * (ps_financing / 100.0) AS payment_ps
+            , transaction_amount * (partner_financing / 100.0) AS payment_partner
             , 0 AS payment_other_client
             , load_ts AS processed_dttm
-        FROM PP.ODS_CINEMA
+        FROM PP.ODS_RETAIL
     ) t
     LEFT JOIN PP.SAT_PARTNERS p
-    ON p.partner_name = 'cinema'
+    ON p.partner_name = 'retail'
     INNER JOIN PP.SAT_BINS b
     ON b.bin = t.bin
     INNER JOIN PP.SAT_PRIVILEGES l
@@ -92,14 +95,10 @@ BEGIN
     ;
 
     -- Сохраняем данные в HUB_DATA, SAT_DATA и в линки
-    CALL PP.LOAD_DATA();
+    CALL PP.LOAD_DATA(dds);
 
     -- Заносим данные о загрузке в отчёт загрузок
-    SET stg = (SELECT count(*) FROM PP.STG_CINEMA);
-    SET ods = (SELECT count(*) FROM PP.ODS_CINEMA);
-    SET dds = (SELECT count(*) FROM PP.TMP_DATA_2);
-
     INSERT INTO PP.DM_LOADS
-    VALUES ('cinema', FORMAT("%4d-%02d", pyear, pmonth), pyear, pmonth, fname, loadts, stg, ods, dds, stg - dds);
+    VALUES ('retail', FORMAT("%4d-%02d", pyear, pmonth), pyear, pmonth, fname, loadts, stg, ods, dds, stg - dds);
 
 END;

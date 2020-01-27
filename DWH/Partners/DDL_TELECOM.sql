@@ -1,3 +1,31 @@
+DROP TABLE IF EXISTS PP.STG_TELECOM;
+CREATE TABLE PP.STG_TELECOM (
+    operation_ts                TIMESTAMP
+    , operation_country         STRING
+    , operation_city            STRING
+    , card_bin                  STRING
+    , card_number               STRING
+    , service                   STRING
+    , payment_tariff            FLOAT64
+    , payment_ps                FLOAT64
+);
+
+DROP TABLE IF EXISTS PP.ODS_TELECOM;
+CREATE TABLE PP.ODS_TELECOM (
+    operation_ts                TIMESTAMP
+    , operation_country         STRING
+    , operation_city            STRING
+    , card_bin                  STRING
+    , card_number               STRING
+    , service                   STRING
+    , payment_tariff            FLOAT64
+    , payment_ps                FLOAT64
+    , period_year               INT64
+    , period_month              INT64
+    , filename                  STRING
+    , load_ts                   TIMESTAMP
+);
+
 CREATE OR REPLACE VIEW `my-project-1530001957977.TELECOM.V_DM_LOADS` AS
 SELECT
     period_name

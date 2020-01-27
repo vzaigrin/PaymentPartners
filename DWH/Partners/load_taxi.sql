@@ -1,5 +1,5 @@
 -- Процедура заполнения таблиц в областях ODS и DDS после заполнения таблицы в области Stage
-CREATE OR REPLACE PROCEDURE PP.LOAD_TELECOM (fname STRING, pyear INT64, pmonth INT64)
+CREATE OR REPLACE PROCEDURE PP.LOAD_TAXI (fname STRING, pyear INT64, pmonth INT64)
 BEGIN
 
     DECLARE loadts TIMESTAMP;
@@ -8,29 +8,32 @@ BEGIN
     DECLARE dds INT64;
 
     SET loadts = CURRENT_TIMESTAMP;
+    SET stg = (SELECT count(*) FROM PP.STG_TAXI);
 
     -- Очищаем таблицу с данными в области ODS
-    DELETE FROM PP.ODS_TELECOM WHERE true;
+    DELETE FROM PP.ODS_TAXI WHERE true;
 
     -- Перегружаем данные из области Srange_frome в область ODS
     -- Добавляем имя файла и время обработки, удаляем некорректные данные
-    INSERT INTO PP.ODS_TELECOM
+    INSERT INTO PP.ODS_TAXI
     SELECT DISTINCT
-        operation_ts
-        , operation_country
-        , operation_city
-        , CAST(card_bin AS STRING) AS card_bin
-        , CAST(card_number AS STRING) AS card_number
-        , service
-        , payment_tariff
-        , payment_ps
+        datetime
+        , ride_town
+        , CAST(bin_number AS STRING) AS bin_number
+        , CAST(last4 AS STRING) AS last4
+        , class
+        , COALESCE(tariff, 0.0)
+        , COALESCE(ps_financing, 0.0)
+        , COALESCE(taxi_financing, 0.0)
         , pyear AS period_year
         , pmonth AS period_month
         , fname AS filename
         , loadts AS load_ts
-    FROM PP.STG_TELECOM
-    WHERE operation_ts BETWEEN TIMESTAMP(DATE(pyear, pmonth, 1)) AND TIMESTAMP(DATE_ADD(DATE(pyear, pmonth, 1), INTERVAL 1 MONTH))
+    FROM PP.STG_TAXI
+    WHERE datetime BETWEEN TIMESTAMP(DATE(pyear, pmonth, 1)) AND TIMESTAMP(DATE_ADD(DATE(pyear, pmonth, 1), INTERVAL 1 MONTH))
     ;
+
+    SET ods = (SELECT count(*) FROM PP.ODS_TAXI);
 
     -- Очищаем TMP_DATA
     DELETE FROM PP.TMP_DATA WHERE true;
@@ -63,43 +66,39 @@ BEGIN
             CAST(payment_ps AS STRING), CAST(payment_partner AS STRING), CAST(payment_other_client AS STRING))) AS _hash
     FROM (
         SELECT
-            card_bin AS bin
-            , card_number AS card_number
-            , operation_ts AS operation_ts
+            bin_number AS bin
+            , last4 AS card_number
+            , datetime AS operation_ts
             , pyear AS period_year
             , pmonth AS period_month
             , FORMAT("%4d-%02d", pyear, pmonth) AS period_name
-            , COALESCE(operation_country, '') AS operation_country
-            , COALESCE(operation_city, '') AS operation_city
-            , payment_tariff AS payment_total
-            , payment_tariff AS payment_tariff
-            , 0 AS payment_main_client
-            , payment_tariff * (payment_ps / 100.0) AS payment_ps
-            , payment_tariff * (1 - (payment_ps / 100.0)) AS payment_partner
+            , 'Россия' AS operation_country
+            , ride_town AS operation_city
+            , tariff AS payment_total
+            , tariff AS payment_tariff
+            , tariff * (1 - (ps_financing + taxi_financing) / 100.0) AS payment_main_client
+            , tariff * (ps_financing / 100.0) AS payment_ps
+            , tariff * (taxi_financing / 100.0) AS payment_partner
             , 0 AS payment_other_client
             , load_ts AS processed_dttm
-        FROM PP.ODS_TELECOM
+        FROM PP.ODS_TAXI
     ) t
     LEFT JOIN PP.SAT_PARTNERS p
-    ON p.partner_name = 'telecom'
+    ON p.partner_name = 'taxi'
     INNER JOIN PP.SAT_BINS b
     ON b.bin = t.bin
     INNER JOIN PP.SAT_PRIVILEGES l
-    ON l.privilege_type = 'free'
+    ON l.privilege_type = 'discount'
     WHERE p.valid_to_dttm IS NULL
         AND b.valid_to_dttm IS NULL
         AND l.valid_to_dttm IS NULL
     ;
 
     -- Сохраняем данные в HUB_DATA, SAT_DATA и в линки
-    CALL PP.LOAD_DATA();
+    CALL PP.LOAD_DATA(dds);
 
     -- Заносим данные о загрузке в отчёт загрузок
-    SET stg = (SELECT count(*) FROM PP.STG_TELECOM);
-    SET ods = (SELECT count(*) FROM PP.ODS_TELECOM);
-    SET dds = (SELECT count(*) FROM PP.TMP_DATA_2);
-
     INSERT INTO PP.DM_LOADS
-    VALUES ('telecom', FORMAT("%4d-%02d", pyear, pmonth), pyear, pmonth, fname, loadts, stg, ods, dds, stg - dds);
+    VALUES ('taxi', FORMAT("%4d-%02d", pyear, pmonth), pyear, pmonth, fname, loadts, stg, ods, dds, stg - dds);
 
 END;

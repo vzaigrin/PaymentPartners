@@ -1,3 +1,31 @@
+DROP TABLE IF EXISTS PP.STG_TAXI;
+CREATE TABLE PP.STG_TAXI (
+    datetime                    TIMESTAMP
+    , ride_town                 STRING
+    , bin_number                STRING
+    , last4                     STRING
+    , class                     STRING
+    , tariff                    FLOAT64
+    , ps_financing              FLOAT64
+    , taxi_financing            FLOAT64
+);
+
+DROP TABLE IF EXISTS PP.ODS_TAXI;
+CREATE TABLE PP.ODS_TAXI (
+    datetime                    TIMESTAMP
+    , ride_town                 STRING
+    , bin_number                STRING
+    , last4                     STRING
+    , class                     STRING
+    , tariff                    FLOAT64
+    , ps_financing              FLOAT64
+    , taxi_financing            FLOAT64
+    , period_year               INT64
+    , period_month              INT64
+    , filename                  STRING
+    , load_ts                   TIMESTAMP
+);
+
 CREATE OR REPLACE VIEW `my-project-1530001957977.TAXI.V_DM_LOADS` AS
 SELECT
     period_name

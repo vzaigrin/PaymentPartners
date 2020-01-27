@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE PP.LOAD_DATA ()
+CREATE OR REPLACE PROCEDURE PP.LOAD_DATA (OUT dds INT64)
 BEGIN
 
     -- Отбираем только новые записи
@@ -10,6 +10,8 @@ BEGIN
     ON t._hash = s._hash
     WHERE s._hash IS NULL
     ;
+
+    SET dds = (SELECT count(*) FROM PP.TMP_DATA_2);
 
     -- Сохраняем данные в HUB_DATA
     INSERT INTO PP.HUB_DATA

@@ -1,3 +1,31 @@
+DROP TABLE IF EXISTS PP.STG_CINEMA;
+CREATE TABLE PP.STG_CINEMA (
+    cinema_name                 STRING
+    , trans_time                TIMESTAMP
+    , discount_type             STRING
+    , base_price                FLOAT64
+    , discount                  FLOAT64
+    , film                      STRING
+    , rrn                       STRING
+    , card_number               STRING
+);
+
+DROP TABLE IF EXISTS PP.ODS_CINEMA;
+CREATE TABLE PP.ODS_CINEMA (
+    cinema_name                 STRING
+    , trans_time                TIMESTAMP
+    , discount_type             STRING
+    , base_price                FLOAT64
+    , discount                  FLOAT64
+    , film                      STRING
+    , rrn                       STRING
+    , card_number               STRING
+    , period_year               INT64
+    , period_month              INT64
+    , filename                  STRING
+    , load_ts                   TIMESTAMP
+);
+
 CREATE OR REPLACE VIEW `my-project-1530001957977.CINEMA.V_DM_LOADS` AS
 SELECT
     period_name

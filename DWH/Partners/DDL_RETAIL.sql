@@ -1,3 +1,31 @@
+DROP TABLE IF EXISTS PP.STG_RETAIL;
+CREATE TABLE PP.STG_RETAIL (
+    order_id                    STRING
+    , card_bin                  STRING
+    , card_number               STRING
+    , bill_date                 TIMESTAMP
+    , transaction_amount        FLOAT64
+    , ps_financing              FLOAT64
+    , partner_financing         FLOAT64
+    , location                  STRING
+);
+
+DROP TABLE IF EXISTS PP.ODS_RETAIL;
+CREATE TABLE PP.ODS_RETAIL (
+    order_id                    STRING
+    , card_bin                  STRING
+    , card_number               STRING
+    , bill_date                 TIMESTAMP
+    , transaction_amount        FLOAT64
+    , ps_financing              FLOAT64
+    , partner_financing         FLOAT64
+    , location                  STRING
+    , period_year               INT64
+    , period_month              INT64
+    , filename                  STRING
+    , load_ts                   TIMESTAMP
+);
+
 CREATE OR REPLACE VIEW `my-project-1530001957977.RETAIL.V_DM_LOADS` AS
 SELECT
     period_name

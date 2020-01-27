@@ -23,52 +23,11 @@ CREATE TABLE PP.STG_PRIVILEGES (
     , privilege_full            STRING NOT NULL
 );
 
-DROP TABLE IF EXISTS PP.STG_TAXI;
-CREATE TABLE PP.STG_TAXI (
-    datetime                    TIMESTAMP NOT NULL
-    , ride_town                 STRING NOT NULL
-    , bin_number                STRING NOT NULL
-    , last4                     STRING NOT NULL
-    , class                     STRING NOT NULL
-    , tariff                    FLOAT64 NOT NULL
-    , ps_financing              FLOAT64 NOT NULL
-    , taxi_financing            FLOAT64 NOT NULL
-);
-
-DROP TABLE IF EXISTS PP.STG_TELECOM;
-CREATE TABLE PP.STG_TELECOM (
-    operation_ts                TIMESTAMP NOT NULL
-    , operation_country         STRING NOT NULL
-    , operation_city            STRING
-    , card_bin                  STRING NOT NULL
-    , card_number               STRING NOT NULL
-    , service                   STRING NOT NULL
-    , payment_tariff            FLOAT64 NOT NULL
-    , payment_ps                FLOAT64 NOT NULL
-);
-
-DROP TABLE IF EXISTS PP.STG_CINEMA;
-CREATE TABLE PP.STG_CINEMA (
-    cinema_name                 STRING NOT NULL
-    , trans_time                TIMESTAMP NOT NULL
-    , discount_type             STRING NOT NULL
-    , base_price                FLOAT64 NOT NULL
-    , discount                  FLOAT64 NOT NULL
-    , film                      STRING NOT NULL
-    , rrn                       STRING NOT NULL
-    , card_number               STRING NOT NULL
-);
-
-DROP TABLE IF EXISTS PP.STG_RETAIL;
-CREATE TABLE PP.STG_RETAIL (
-    order_id                    STRING NOT NULL
-    , card_bin                  STRING NOT NULL
-    , card_number               STRING NOT NULL
-    , bill_date                 TIMESTAMP NOT NULL
-    , transaction_amount        FLOAT64 NOT NULL
-    , ps_financing              FLOAT64 NOT NULL
-    , partner_financing         FLOAT64 NOT NULL
-    , location                  STRING NOT NULL
+DROP TABLE IF EXISTS PP.STG_CITY;
+CREATE TABLE PP.STG_CITY (
+    id                          STRING NOT NULL
+    , city                      STRING NOT NULL
+    , country                   STRING NOT NULL
 );
 
 
@@ -93,68 +52,11 @@ CREATE TABLE PP.ODS_PRIVILEGES (
     , privilege_full            STRING NOT NULL
 );
 
-DROP TABLE IF EXISTS PP.ODS_TAXI;
-CREATE TABLE PP.ODS_TAXI (
-    datetime                    TIMESTAMP NOT NULL
-    , ride_town                 STRING NOT NULL
-    , bin_number                STRING NOT NULL
-    , last4                     STRING NOT NULL
-    , class                     STRING NOT NULL
-    , tariff                    FLOAT64 NOT NULL
-    , ps_financing              FLOAT64 NOT NULL
-    , taxi_financing            FLOAT64 NOT NULL
-    , period_year               INT64 NOT NULL
-    , period_month              INT64 NOT NULL
-    , filename                  STRING NOT NULL
-    , load_ts                   TIMESTAMP NOT NULL
-);
-
-DROP TABLE IF EXISTS PP.ODS_TELECOM;
-CREATE TABLE PP.ODS_TELECOM (
-    operation_ts                TIMESTAMP NOT NULL
-    , operation_country         STRING NOT NULL
-    , operation_city            STRING
-    , card_bin                  STRING NOT NULL
-    , card_number               STRING NOT NULL
-    , service                   STRING NOT NULL
-    , payment_tariff            FLOAT64 NOT NULL
-    , payment_ps                FLOAT64 NOT NULL
-    , period_year               INT64 NOT NULL
-    , period_month              INT64 NOT NULL
-    , filename                  STRING NOT NULL
-    , load_ts                   TIMESTAMP NOT NULL
-);
-
-DROP TABLE IF EXISTS PP.ODS_CINEMA;
-CREATE TABLE PP.ODS_CINEMA (
-    cinema_name                 STRING NOT NULL
-    , trans_time                TIMESTAMP NOT NULL
-    , discount_type             STRING NOT NULL
-    , base_price                FLOAT64 NOT NULL
-    , discount                  FLOAT64 NOT NULL
-    , film                      STRING NOT NULL
-    , rrn                       STRING NOT NULL
-    , card_number               STRING NOT NULL
-    , period_year               INT64 NOT NULL
-    , period_month              INT64 NOT NULL
-    , filename                  STRING NOT NULL
-    , load_ts                   TIMESTAMP NOT NULL
-);
-
-DROP TABLE IF EXISTS PP.ODS_RETAIL;
-CREATE TABLE PP.ODS_RETAIL (
-    order_id                    STRING NOT NULL
-    , card_bin                  STRING NOT NULL
-    , card_number               STRING NOT NULL
-    , bill_date                 TIMESTAMP NOT NULL
-    , transaction_amount        FLOAT64 NOT NULL
-    , ps_financing              FLOAT64 NOT NULL
-    , partner_financing         FLOAT64 NOT NULL
-    , location                  STRING NOT NULL
-    , period_year               INT64 NOT NULL
-    , period_month              INT64 NOT NULL
-    , filename                  STRING NOT NULL
-    , load_ts                   TIMESTAMP NOT NULL
+DROP TABLE IF EXISTS PP.ODS_CITY;
+CREATE TABLE PP.ODS_CITY (
+    id                          STRING NOT NULL
+    , city                      STRING NOT NULL
+    , country                   STRING NOT NULL
 );
 
 
@@ -252,6 +154,13 @@ CREATE TABLE PP.LNK_DATA_PRIVILEGES (
     , processed_dttm            TIMESTAMP NOT NULL
 );
 
+DROP TABLE IF EXISTS PP.LNK_DATA_CITY;
+CREATE TABLE PP.LNK_DATA_CITY (
+    data_id                     STRING NOT NULL
+    , city_id                   STRING NOT NULL
+    , processed_dttm            TIMESTAMP NOT NULL
+);
+
 DROP TABLE IF EXISTS PP.HUB_PARTNERS;
 CREATE TABLE PP.HUB_PARTNERS (
     partner_id                  STRING NOT NULL
@@ -340,6 +249,38 @@ CREATE TABLE PP.TMP_PRIVILEGES (
     , privilege_type            STRING NOT NULL
     , privilege_short           STRING NOT NULL
     , privilege_full            STRING NOT NULL
+    , processed_dttm            TIMESTAMP NOT NULL
+    , valid_from_dttm           TIMESTAMP NOT NULL
+    , valid_to_dttm             TIMESTAMP
+    , _hash                     BYTES NOT NULL
+);
+
+DROP TABLE IF EXISTS PP.HUB_CITY;
+CREATE TABLE PP.HUB_CITY (
+    city_id                     STRING NOT NULL
+    , processed_dttm            TIMESTAMP NOT NULL
+    , valid_from_dttm           TIMESTAMP NOT NULL
+    , valid_to_dttm             TIMESTAMP
+);
+
+DROP TABLE IF EXISTS PP.SAT_CITY;
+CREATE TABLE PP.SAT_CITY (
+    city_id                     STRING NOT NULL
+    , id                        STRING NOT NULL
+    , city                      STRING NOT NULL
+    , country                   STRING NOT NULL
+    , processed_dttm            TIMESTAMP NOT NULL
+    , valid_from_dttm           TIMESTAMP NOT NULL
+    , valid_to_dttm             TIMESTAMP
+    , _hash                     BYTES NOT NULL
+);
+
+DROP TABLE IF EXISTS PP.TMP_CITY;
+CREATE TABLE PP.TMP_CITY (
+    city_id                     STRING NOT NULL
+    , id                        STRING NOT NULL
+    , city                      STRING NOT NULL
+    , country                   STRING NOT NULL
     , processed_dttm            TIMESTAMP NOT NULL
     , valid_from_dttm           TIMESTAMP NOT NULL
     , valid_to_dttm             TIMESTAMP
