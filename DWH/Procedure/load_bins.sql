@@ -5,30 +5,10 @@ BEGIN
     -- Очищаем таблицу с данными о bins в области ODS
     DELETE FROM PP.ODS_BINS WHERE true;
 
-    -- Перегружаем данные о bins из области Srange_frome в область ODS
-    INSERT INTO PP.ODS_BINS
-    SELECT
-    bin
-    , bank
-    , card_type
-    FROM (
-    SELECT
-        CAST(bin AS STRING) AS bin
-        , bank
-        , card_type
-        , ROW_NUMBER() OVER (PARTITION BY bin ORDER BY bin DESC) AS row_num
-    FROM PP.STG_BINS
-    ) b
-    WHERE b.row_num = 1
-    ;
-
-    -- Очищаем TMP_BINS
-    DELETE FROM PP.TMP_BINS WHERE true;
-
-    -- Объединяем данные о bins из области ODS с данными в области DDS во временную таблицу
+    -- Объединяем данные о bins из области Stage с данными в области DDS в область ODS
     -- Добавляем записи о bins, которых не было
     -- Помечаем устаревшими записи, которых уже нет
-    INSERT INTO PP.TMP_BINS
+    INSERT INTO PP.ODS_BINS
     SELECT
     COALESCE(s.bin_id, o.bin_id) AS bin_id
     , COALESCE(s.bin, o.bin) AS bin
@@ -37,20 +17,30 @@ BEGIN
     , COALESCE(s.processed_dttm, o.processed_dttm) AS processed_dttm
     , COALESCE(s.valid_from_dttm, o.processed_dttm) AS valid_from_dttm
     , CASE
-            WHEN o.bin_id IS NULL
+        WHEN o.bin_id IS NULL
             THEN CURRENT_TIMESTAMP
             ELSE CAST(NULL AS TIMESTAMP)
-        END AS valid_to_dttm
+      END AS valid_to_dttm
     , COALESCE(s._hash, o._hash) AS _hash
     FROM (
-    SELECT
-        GENERATE_UUID() AS bin_id
-        , bin
-        , bank
-        , card_type
-        , CURRENT_TIMESTAMP AS processed_dttm
-        , MD5(bin) AS _hash
-    FROM PP.ODS_BINS
+        SELECT
+            GENERATE_UUID() AS bin_id
+            , bin
+            , bank
+            , card_type
+            , CURRENT_TIMESTAMP AS processed_dttm
+            , MD5(CONCAT(bin, range_from, range_to)) AS _hash
+        FROM (
+            SELECT
+                bin
+                , range_from
+                , range_to
+                , bank
+                , card_type
+                , ROW_NUMBER() OVER (PARTITION BY bin ORDER BY bin, range_from, range_to DESC) AS row_num
+            FROM PP.STG_BINS
+        ) b
+        WHERE b.row_num = 1
     ) o
     FULL JOIN PP.SAT_BINS s
     ON o._hash = s._hash;
@@ -60,13 +50,13 @@ BEGIN
 
     INSERT INTO PP.HUB_BINS
     SELECT bin_id, processed_dttm, valid_from_dttm, valid_to_dttm
-    FROM PP.TMP_BINS;
+    FROM PP.ODS_BINS;
 
     -- Очищаем SAT_BINS и заполняем его новыми данными
     DELETE FROM PP.SAT_BINS WHERE true;
 
     INSERT INTO PP.SAT_BINS
     SELECT *
-    FROM PP.TMP_BINS;
+    FROM PP.ODS_BINS;
 
 END;
