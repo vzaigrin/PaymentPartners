@@ -95,8 +95,8 @@ BEGIN
     CALL PP.LOAD_DATA();
 
     -- Заносим данные о загрузке в отчёт загрузок
-    SET stg = (SELECT count(*) FROM PP.STG_CINEMA);
-    SET ods = (SELECT count(*) FROM PP.ODS_CINEMA);
+    SET stg = (SELECT count(*) FROM PP.STG_TAXI);
+    SET ods = (SELECT count(*) FROM PP.ODS_TAXI);
     SET dds = (SELECT count(*) FROM PP.TMP_DATA_2);
 
     INSERT INTO PP.DM_LOADS

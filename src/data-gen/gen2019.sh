@@ -7,6 +7,7 @@ do
     mkdir -p $basedir/$partner
     for num in {1..12}
     do
-        ./data-gen -t $file -o $basedir/$partner/$partner-${num}.csv -y 2019 -m $num -e 10 -v
+    	mkdir -p $basedir/$partner/$num
+        ./data-gen -t $file -o $basedir/$partner/$num/$partner-${num}.csv -y 2019 -m $num -e 10 -v
     done
 done

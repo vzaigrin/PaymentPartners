@@ -17,6 +17,14 @@ func LoadFileToTable(ctx context.Context, projectID string, datasetID string, ta
 		return fmt.Errorf("bigquery.NewClient: %v", err)
 	}
 
+	// Получаем схему таблицы
+	md, err := client.Dataset(datasetID).Table(tableID).Metadata(ctx)
+	if err != nil {
+		return fmt.Errorf("bigquery.Dataset.Table.Metadata: %v", err)
+	}
+	schema := md.Schema
+
+	// Создаём загрузчик
 	var loader *bigquery.Loader
 
 	// Определяем источник по префиксу имени файла
@@ -25,8 +33,9 @@ func LoadFileToTable(ctx context.Context, projectID string, datasetID string, ta
 		source := bigquery.NewGCSReference(filename)
 		// Устанавливаем параметры
 		source.SourceFormat = bigquery.CSV
-		source.AutoDetect = true   // Allow BigQuery to determine schema.
+		source.Schema = schema
 		source.SkipLeadingRows = 1 // CSV has a single header line.
+		source.FieldDelimiter = ","
 		loader = client.Dataset(datasetID).Table(tableID).LoaderFrom(source)
 	} else {
 		// Читаем локальный файл
@@ -37,8 +46,9 @@ func LoadFileToTable(ctx context.Context, projectID string, datasetID string, ta
 		source := bigquery.NewReaderSource(fo)
 		// Устанавливаем параметры
 		source.SourceFormat = bigquery.CSV
-		source.AutoDetect = true   // Allow BigQuery to determine schema.
+		source.Schema = schema
 		source.SkipLeadingRows = 1 // CSV has a single header line.
+		source.FieldDelimiter = ","
 		loader = client.Dataset(datasetID).Table(tableID).LoaderFrom(source)
 	}
 

@@ -63,23 +63,24 @@ func LoadData(ctx context.Context, m PubSubMessage) error {
 		}
 
 		fileName := splitName[len(splitName)-1]
-		tableID := strings.ToUpper(splitName[1])
+		partner := strings.ToUpper(splitName[1])
+		tableID := "STG_" + partner
 
-		// Загрузаем только файлы CSV
+		// Загружаем только файлы CSV
 		splitFile := strings.Split(fileName, ".")
 		if len(splitFile) < 2 || strings.ToUpper(splitFile[1]) != "CSV" {
 			continue
 		}
 
 		// Загружаем файл в таблицу в области Stage, перезаписывая её
-		err = LoadFileToTable(ctx, projectID, datasetID, "STG_"+tableID, "gs://"+bucket+"/"+attrs.Name)
+		err = LoadFileToTable(ctx, projectID, datasetID, tableID, "gs://"+bucket+"/"+attrs.Name)
 		if err != nil {
-			log.Printf("Error loading file %v into table 'STG_%v': %v", attrs.Name, tableID, err)
+			log.Printf("Error loading file %v into table '%v': %v", attrs.Name, tableID, err)
 			return err
 		}
 
 		// Если файл загружен успешно в область Stage, то вызываем процедуру для перегрузки данных в области ODS и DDS
-		query := "CALL " + datasetID + ".LOAD_" + tableID + "('" + fileName + "'," + strconv.Itoa(year) + ", " + strconv.Itoa(int(month)) + ");"
+		query := "CALL " + datasetID + ".LOAD_" + partner + "('" + fileName + "'," + strconv.Itoa(year) + ", " + strconv.Itoa(int(month)) + ");"
 		err = RunQuery(ctx, projectID, query)
 		if err != nil {
 			log.Printf("Error running query '%v': %v", query, err)
