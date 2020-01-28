@@ -13,16 +13,16 @@ BEGIN
     -- Очищаем таблицу с данными в области ODS
     DELETE FROM PP.ODS_TELECOM WHERE true;
 
-    -- Перегружаем данные из области Srange_frome в область ODS
+    -- Перегружаем данные из области STAGE в область ODS
     -- Добавляем имя файла и время обработки, удаляем некорректные данные
     INSERT INTO PP.ODS_TELECOM
     SELECT DISTINCT
-        operation_ts
-        , operation_country
-        , operation_city
-        , CAST(card_bin AS STRING) AS card_bin
-        , CAST(card_number AS STRING) AS card_number
-        , service
+        COALESCE(operation_ts, TIMESTAMP(DATE(pyear, pmonth, 1)))
+        , COALESCE(operation_country, '')
+        , COALESCE(operation_city, '')
+        , COALESCE(card_bin, '')
+        , COALESCE(card_number, '')
+        , COALESCE(service, '')
         , COALESCE(payment_tariff, 0.0)
         , COALESCE(payment_ps, 0.0)
         , pyear AS period_year
@@ -39,63 +39,29 @@ BEGIN
     DELETE FROM PP.TMP_DATA WHERE true;
 
     -- Приводим данные к единому формату области DDS
-    -- Добавляем id партнёров, bins и привелегий
     -- Сохраняем всё во временную таблицу
     INSERT INTO PP.TMP_DATA
     SELECT
-        GENERATE_UUID() AS data_id
-        , card_number
-        , operation_ts
-        , period_year
-        , period_month
-        , period_name
-        , operation_country
-        , operation_city
-        , payment_total
-        , payment_tariff
-        , payment_main_client
-        , payment_ps
-        , payment_partner
-        , payment_other_client
-        , t.processed_dttm
-        , p.partner_id
-        , b.bin_id
-        , l.privilege_id
-        , MD5(CONCAT(card_number, CAST(operation_ts AS STRING), CAST(period_year AS STRING), CAST(period_month AS STRING), period_name,
-            operation_country, operation_city, CAST(payment_total AS STRING), CAST(payment_tariff AS STRING), CAST(payment_main_client AS STRING),
-            CAST(payment_ps AS STRING), CAST(payment_partner AS STRING), CAST(payment_other_client AS STRING))) AS _hash
-    FROM (
-        SELECT
-            card_bin AS bin
-            , card_number AS card_number
-            , operation_ts AS operation_ts
-            , pyear AS period_year
-            , pmonth AS period_month
-            , FORMAT("%4d-%02d", pyear, pmonth) AS period_name
-            , COALESCE(operation_country, '') AS operation_country
-            , COALESCE(operation_city, '') AS operation_city
-            , payment_tariff AS payment_total
-            , payment_tariff AS payment_tariff
-            , 0 AS payment_main_client
-            , payment_tariff * (payment_ps / 100.0) AS payment_ps
-            , payment_tariff * (1 - (payment_ps / 100.0)) AS payment_partner
-            , 0 AS payment_other_client
-            , load_ts AS processed_dttm
-        FROM PP.ODS_TELECOM
-    ) t
-    LEFT JOIN PP.SAT_PARTNERS p
-    ON p.partner_name = 'telecom'
-    INNER JOIN PP.SAT_BINS b
-    ON b.bin = t.bin
-    INNER JOIN PP.SAT_PRIVILEGES l
-    ON l.privilege_type = 'free'
-    WHERE p.valid_to_dttm IS NULL
-        AND b.valid_to_dttm IS NULL
-        AND l.valid_to_dttm IS NULL
+        card_bin AS bin
+        , card_number AS card_number
+        , operation_ts AS operation_ts
+        , pyear AS period_year
+        , pmonth AS period_month
+        , FORMAT("%4d-%02d", pyear, pmonth) AS period_name
+        , COALESCE(operation_country, '') AS operation_country
+        , COALESCE(operation_city, '') AS operation_city
+        , payment_tariff AS payment_total
+        , payment_tariff AS payment_tariff
+        , 0 AS payment_main_client
+        , payment_tariff * (payment_ps / 100.0) AS payment_ps
+        , payment_tariff * (1 - (payment_ps / 100.0)) AS payment_partner
+        , 0 AS payment_other_client
+        , load_ts AS processed_dttm
+    FROM PP.ODS_TELECOM
     ;
 
     -- Сохраняем данные в HUB_DATA, SAT_DATA и в линки
-    CALL PP.LOAD_DATA(dds);
+    CALL PP.LOAD_DATA('telecom', dds);
 
     -- Заносим данные о загрузке в отчёт загрузок
     INSERT INTO PP.DM_LOADS

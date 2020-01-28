@@ -34,8 +34,16 @@ BEGIN
             , b.card_type
             , b.bank
             , CAST(d.operation_ts AS DATE) AS operation_dt
-            , d.operation_country
-            , d.operation_city
+            , CASE
+                WHEN c.city_id IS NOT NULL
+                THEN c.country
+                ELSE d.operation_country
+              END AS operation_country
+            , CASE
+                WHEN c.city_id IS NOT NULL
+                THEN c.city
+                ELSE d.operation_city
+              END AS operation_city
             , r.privilege_type
             , p.tag as partner_class
             , d.period_name
@@ -60,6 +68,10 @@ BEGIN
         ON d.data_id = ldr.data_id
         JOIN PP.SAT_PRIVILEGES r
         ON ldr.privilege_id = r.privilege_id
+        JOIN PP.LNK_DATA_CITY ldc
+        ON d.data_id = ldc.data_id
+        JOIN PP.SAT_CITY c
+        ON ldc.city_id = c.city_id
         WHERE period_year = pyear AND period_month = pmonth
     )
     GROUP BY
@@ -75,5 +87,5 @@ BEGIN
         , period_year
         , period_month
     ;
-    
+
 END;

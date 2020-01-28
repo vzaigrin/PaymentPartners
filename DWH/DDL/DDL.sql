@@ -34,44 +34,88 @@ CREATE TABLE PP.STG_CITY (
 -- ODS
 DROP TABLE IF EXISTS PP.ODS_PARTNERS;
 CREATE TABLE PP.ODS_PARTNERS (
-    partner_name                STRING NOT NULL
-    , tag                       STRING NOT NULL
+    partner_name                STRING
+    , tag                       STRING
 );
 
 DROP TABLE IF EXISTS PP.ODS_BINS;
 CREATE TABLE PP.ODS_BINS (
-    bin_id                      STRING NOT NULL
-    , bin                       STRING NOT NULL
-    , bank                      STRING NOT NULL
-    , card_type                 STRING NOT NULL
-    , processed_dttm            TIMESTAMP NOT NULL
-    , valid_from_dttm           TIMESTAMP NOT NULL
+    bin_id                      STRING
+    , bin                       STRING
+    , bank                      STRING
+    , card_type                 STRING
+    , processed_dttm            TIMESTAMP
+    , valid_from_dttm           TIMESTAMP
     , valid_to_dttm             TIMESTAMP
-    , _hash                     BYTES NOT NULL
+    , _hash                     BYTES
 );
 
 DROP TABLE IF EXISTS PP.ODS_PRIVILEGES;
 CREATE TABLE PP.ODS_PRIVILEGES (
-    privilege_id                STRING NOT NULL
-    , privilege_type            STRING NOT NULL
-    , privilege_short           STRING NOT NULL
-    , privilege_full            STRING NOT NULL
-    , processed_dttm            TIMESTAMP NOT NULL
-    , valid_from_dttm           TIMESTAMP NOT NULL
+    privilege_id                STRING
+    , privilege_type            STRING
+    , privilege_short           STRING
+    , privilege_full            STRING
+    , processed_dttm            TIMESTAMP
+    , valid_from_dttm           TIMESTAMP
     , valid_to_dttm             TIMESTAMP
-    , _hash                     BYTES NOT NULL
+    , _hash                     BYTES
 );
 
 DROP TABLE IF EXISTS PP.ODS_CITY;
 CREATE TABLE PP.ODS_CITY (
-    city_id                     STRING NOT NULL
-    , id                        STRING NOT NULL
-    , city                      STRING NOT NULL
-    , country                   STRING NOT NULL
-    , processed_dttm            TIMESTAMP NOT NULL
-    , valid_from_dttm           TIMESTAMP NOT NULL
+    city_id                     STRING
+    , id                        STRING
+    , city                      STRING
+    , country                   STRING
+    , processed_dttm            TIMESTAMP
+    , valid_from_dttm           TIMESTAMP
     , valid_to_dttm             TIMESTAMP
-    , _hash                     BYTES NOT NULL
+    , _hash                     BYTES
+);
+
+DROP TABLE IF EXISTS PP.TMP_DATA;
+CREATE TABLE PP.TMP_DATA (
+    bin                         STRING
+    , card_number               STRING
+    , operation_ts              TIMESTAMP
+    , period_year               INT64
+    , period_month              INT64
+    , period_name               STRING
+    , operation_country         STRING
+    , operation_city            STRING
+    , payment_total             FLOAT64
+    , payment_tariff            FLOAT64
+    , payment_main_client       FLOAT64
+    , payment_visa              FLOAT64
+    , payment_partner           FLOAT64
+    , payment_other_client      FLOAT64
+    , privilege_type            STRING
+    , processed_dttm            TIMESTAMP
+);
+
+DROP TABLE IF EXISTS PP.ODS_DATA;
+CREATE TABLE PP.ODS_DATA (
+    data_id                     STRING
+    , card_number               STRING
+    , operation_ts              TIMESTAMP
+    , period_year               INT64
+    , period_month              INT64
+    , period_name               STRING
+    , operation_country         STRING
+    , operation_city            STRING
+    , payment_total             FLOAT64
+    , payment_tariff            FLOAT64
+    , payment_main_client       FLOAT64
+    , payment_visa              FLOAT64
+    , payment_partner           FLOAT64
+    , payment_other_client      FLOAT64
+    , processed_dttm            TIMESTAMP
+    , partner_id                STRING
+    , bin_id                    STRING
+    , privilege_id              STRING
+    , city_id                   STRING
+    , _hash                     BYTES
 );
 
 
@@ -99,52 +143,6 @@ CREATE TABLE PP.SAT_DATA (
     , payment_partner           FLOAT64 NOT NULL
     , payment_other_client      FLOAT64 NOT NULL
     , processed_dttm            TIMESTAMP NOT NULL
-    , _hash                     BYTES NOT NULL
-);
-
-DROP TABLE IF EXISTS PP.TMP_DATA;
-CREATE TABLE PP.TMP_DATA (
-    data_id                     STRING NOT NULL
-    , card_number               STRING NOT NULL
-    , operation_ts              TIMESTAMP NOT NULL
-    , period_year               INT64 NOT NULL
-    , period_month              INT64 NOT NULL
-    , period_name               STRING NOT NULL
-    , operation_country         STRING NOT NULL
-    , operation_city            STRING NOT NULL
-    , payment_total             FLOAT64 NOT NULL
-    , payment_tariff            FLOAT64 NOT NULL
-    , payment_main_client       FLOAT64 NOT NULL
-    , payment_ps                FLOAT64 NOT NULL
-    , payment_partner           FLOAT64 NOT NULL
-    , payment_other_client      FLOAT64 NOT NULL
-    , processed_dttm            TIMESTAMP NOT NULL
-    , partner_id                STRING NOT NULL
-    , bin_id                    STRING NOT NULL
-    , privilege_id              STRING NOT NULL
-    , _hash                     BYTES NOT NULL
-);
-
-DROP TABLE IF EXISTS PP.TMP_DATA_2;
-CREATE TABLE PP.TMP_DATA_2 (
-    data_id                     STRING NOT NULL
-    , card_number               STRING NOT NULL
-    , operation_ts              TIMESTAMP NOT NULL
-    , period_year               INT64 NOT NULL
-    , period_month              INT64 NOT NULL
-    , period_name               STRING NOT NULL
-    , operation_country         STRING NOT NULL
-    , operation_city            STRING NOT NULL
-    , payment_total             FLOAT64 NOT NULL
-    , payment_tariff            FLOAT64 NOT NULL
-    , payment_main_client       FLOAT64 NOT NULL
-    , payment_ps                FLOAT64 NOT NULL
-    , payment_partner           FLOAT64 NOT NULL
-    , payment_other_client      FLOAT64 NOT NULL
-    , processed_dttm            TIMESTAMP NOT NULL
-    , partner_id                STRING NOT NULL
-    , bin_id                    STRING NOT NULL
-    , privilege_id              STRING NOT NULL
     , _hash                     BYTES NOT NULL
 );
 
