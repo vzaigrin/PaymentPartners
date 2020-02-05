@@ -1,0 +1,104 @@
+{
+  "fields": [
+    {
+      "name": "order_id",
+      "type": "INT64",
+      "values": {
+        "range": [10000, 19999]
+      }
+    },
+    {
+      "name": "card_bin",
+      "type": "STRING",
+      "values": {
+        "list-file": "bins.csv"
+      }
+    },
+    {
+      "name": "card_number",
+      "type": "STRING",
+      "length": 4,
+      "values": {
+        "range": [0, 9999]
+      }
+    },
+    {
+      "name": "bill_date",
+      "type": "TIMESTAMP"
+    },
+    {
+      "name": "transaction_amount",
+      "type": "FLOAT64",
+      "values": {
+        "range": [100.0, 50000.0]
+      }
+    },
+    {
+      "name": "ps_financing",
+      "type": "FLOAT64",
+      "values": {
+        "range": [10.0, 20.0]
+      }
+    },
+    {
+      "name": "partner_financing",
+      "type": "FLOAT64",
+      "values": {
+        "range": [0.0, 5.0]
+      }
+    },
+    {
+      "name": "location",
+      "type": "STRING",
+      "values": {
+        "list": ["Москва", "Санкт-Петербург", "Сочи", "Екатеринбург", "Казань", "Краснодар", "Пермь"]
+      }
+    }
+  ],
+  "dds": [
+    {
+      "target": "bin",
+      "source": "card_bin"
+    },
+    {
+      "target": "card_number",
+      "source": "card_number"
+    },
+    {
+      "target": "operation_ts",
+      "source": "bill_date"
+    },
+    {
+      "target": "operation_country",
+      "source": "'Россия'"
+    },
+    {
+      "target": "operation_city",
+      "source": "location"
+    },
+    {
+      "target": "payment_total",
+      "source": "transaction_amount"
+    },
+    {
+      "target": "payment_tariff",
+      "source": "transaction_amount"
+    },
+    {
+      "target": "payment_main_client",
+      "source": "transaction_amount * (1 - (ps_financing + partner_financing) / 100.0)"
+    },
+    {
+      "target": "payment_ps",
+      "source": "transaction_amount * (ps_financing / 100.0)"
+    },
+    {
+      "target": "payment_partner",
+      "source": "transaction_amount * (partner_financing / 100.0)"
+    },
+    {
+      "target": "payment_other_client",
+      "source": "0.0"
+    }
+  ]
+}

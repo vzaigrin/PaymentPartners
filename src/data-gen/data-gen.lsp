@@ -29,8 +29,8 @@
 
 ;;; Структура для параметров
 (defstruct parameters
-    (templ-file "" :type string)
-    (data-file "" :type string)
+    (templ-file)
+    (data-file)
     (year 0 :type integer)
     (month 0 :type integer)
     (num-lines 100000 :type integer)
@@ -113,22 +113,16 @@
 
 ;;; Структура для описания полей данных
 (defstruct field
-    (name "" :type string)
-    (type "" :type string)
-    (length nil)
-    (nullable nil)
-    (values))
+    name ftype length nullable values)
 
-(defun fillfield (lst)
+(defun fillfield (l)
     "Заполняем структуру поля данных по списку свойств"
     (let ((field (make-field)))
-        (dolist (l lst)
-            (cond
-                ((eq (car l) :NAME) (setf (field-name field) (cdr l)))
-                ((eq (car l) :TYPE) (setf (field-type field) (cdr l)))
-                ((eq (car l) :LENGTH) (setf (field-length field) (cdr l)))
-                ((eq (car l) :NULLABLE) (setf (field-nullable field) t))
-                ((eq (car l) :VALUES) (setf (field-values field) (cadr l)))))
+        (setf (field-name field) (cdr (assoc :NAME l)))
+        (setf (field-ftype field) (cdr (assoc :TYPE l)))
+        (setf (field-length field) (cdr (assoc :LENGTH l)))
+        (setf (field-nullable field) (cdr (assoc :NULLABLE l)))
+        (setf (field-values field) (cadr (assoc :VALUES l)))
         field))
 
 (defun list2string (lst &optional (sep ",") (frs nil))
@@ -188,16 +182,16 @@
     "Генерируем значение по описанию поля"
     (cond
         ((field-nullable field) "")
-        ((equal (field-type field) "TIMESTAMP")
+        ((equal (field-ftype field) "TIMESTAMP")
             (gen-timestamp year month error))
         ((null (field-values field))
-            (exit-error
-                (format nil "Неправильный формат шаблона. Нет значения для поля ~a" (field-name field))))
+            (exit-error (format nil "Неправильный формат шаблона. Нет значения для поля ~a" (field-name field))))
         ((eq (car (field-values field)) :LIST)
             (get-from-list (cdr (field-values field))))
         ((eq (car (field-values field)) :RANGE)
             (cond
-                ((equal (field-type field) "INT64")
+                ((or (equal (field-ftype field) "STRING")
+                     (equal (field-ftype field) "INT64"))
                     (format nil
                         (if (field-length field)
                             (concatenate 'string "~" (write-to-string (field-length field)) ",'0d")
@@ -205,13 +199,12 @@
                         (random-range
                             (second (field-values field))
                             (third (field-values field)))))
-                ((equal (field-type field) "FLOAT64")
+                ((equal (field-ftype field) "FLOAT64")
                     (format nil "~,2f"
                         (/ (random-range
                             (* 100 (second (field-values field)))
                             (* 100 (third (field-values field))))
-                            100.0)))
-                (t "")))
+                            100.0)))))
         (t "")))
 
 (defun main ()
@@ -219,8 +212,10 @@
     (let ((params (parse-args (cdr sb-ext:*posix-argv*) (make-parameters)))
           (fields)) ; список разобранных полей данных
         ;; проверяем корректность заданных параметров
+        (if (not (parameters-templ-file params))
+            (usage "Файл для шаблона не задан"))
         (if (not (probe-file (parameters-templ-file params)))
-            (exit-error (format nil "Файл для шаблона ~s не найден"
+            (usage (format nil "Файл для шаблона ~s не найден"
                 (parameters-templ-file params))))
         (if (eq (parameters-year params) 0) (usage "Не задан год"))
         (if (eq (parameters-month params) 0) (usage "Не задан месяц"))
@@ -245,12 +240,13 @@
         ;; Из файла с шаблоном берём первое поле с именем "fields"
         (setf fields
             (mapcar #'fillfield
-                (cdar (remove-if-not #'(lambda (x) (eq (car x) :FIELDS))
-                    (decode-file (parameters-templ-file params))))))
+                (cdr (assoc :FIELDS (decode-file (parameters-templ-file params))))))
+        ;; Выходим, если файл не содержит список fields
+        (if (not fields) (exit-error "Не задан список Fields в файле с шаблоном"))
         ;; Выходим, если поля не содержат имени и типа
-        (if (some #'(lambda (x) (eq (field-name x) "")) fields)
+        (if (not (every #'field-name fields))
             (exit-error "Неправильный формат шаблона. Нет имени поля"))
-        (if (some #'(lambda (x) (eq (field-type x) "")) fields)
+        (if (not (every #'field-ftype fields))
             (exit-error "Неправильный формат шаблона. Нет типа поля"))
         ;; Если поле содержит имя файла со списком, заменяем его на список из файла
         (setf fields
@@ -258,7 +254,7 @@
                 (if (eq (car (field-values x)) :LIST-FILE)
                     (make-field
                         :name (field-name x)
-                        :type (field-type x)
+                        :ftype (field-ftype x)
                         :length (field-length x)
                         :nullable (field-nullable x)
                         :values

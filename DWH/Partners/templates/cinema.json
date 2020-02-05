@@ -1,0 +1,104 @@
+{
+  "fields": [
+    {
+      "name": "cinema_name",
+      "type": "STRING",
+      "values": {
+        "list": ["Кино 1", "Кино 2", "Кино 3", "Кино 4", "Кино 5"]
+      }
+    },
+    {
+      "name": "trans_time",
+      "type": "TIMESTAMP"
+    },
+    {
+      "name": "discount_type",
+      "type": "STRING",
+      "values": {
+        "list": ["Infinite", "Signature", "Platinum"]
+      }
+    },
+    {
+      "name": "base_price",
+      "type": "FLOAT64",
+      "values": {
+        "range": [100.0, 500.0]
+      }
+    },
+    {
+      "name": "discount",
+      "type": "FLOAT64",
+      "values": {
+        "range": [2.0, 5.0]
+      }
+    },
+    {
+      "name": "film",
+      "type": "STRING",
+      "values": {
+        "list": ["Фильм 1", "Фильм 2", "Фильм 3", "Фильм 4", "Фильм 5", "Фильм 6", "Фильм 7", "Фильм 8", "Фильм 9", "Фильм 10"]
+      }
+    },
+    {
+      "name": "rrn",
+      "type": "STRING",
+      "values": {
+        "list-file": "bins.csv"
+      }
+    },
+    {
+      "name": "card_number",
+      "type": "STRING",
+      "length": 4,
+      "values": {
+        "range": [0, 9999]
+      }
+    }
+  ],
+  "dds": [
+    {
+      "target": "bin",
+      "source": "rrn"
+    },
+    {
+      "target": "card_number",
+      "source": "card_number"
+    },
+    {
+      "target": "operation_ts",
+      "source": "trans_time"
+    },
+    {
+      "target": "operation_country",
+      "source": "'Россия'"
+    },
+    {
+      "target": "operation_city",
+      "source": "'Москва'"
+    },
+    {
+      "target": "payment_total",
+      "source": "base_price"
+    },
+    {
+      "target": "payment_tariff",
+      "source": "base_price"
+    },
+    {
+      "target": "payment_main_client",
+      "source": "base_price * (1 - (discount / 100.0))"
+    },
+    {
+      "target": "payment_ps",
+      "source": "base_price * (discount / 100.0)"
+    },
+    {
+      "target": "payment_partner",
+      "source": "0.0"
+    },
+    {
+      "target": "payment_other_client",
+      "source": "0.0"
+    }
+  ]
+}
