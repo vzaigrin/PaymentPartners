@@ -1,12 +1,6 @@
 #standardSQL
 
 -- Stage
-DROP TABLE IF EXISTS PP.STG_PARTNERS;
-CREATE TABLE PP.STG_PARTNERS (
-    partner_name                STRING
-    , tag                       STRING
-);
-
 DROP TABLE IF EXISTS PP.STG_BINS;
 CREATE TABLE PP.STG_BINS (
     bin                         STRING
@@ -32,12 +26,6 @@ CREATE TABLE PP.STG_CITY (
 
 
 -- ODS
-DROP TABLE IF EXISTS PP.ODS_PARTNERS;
-CREATE TABLE PP.ODS_PARTNERS (
-    partner_name                STRING
-    , tag                       STRING
-);
-
 DROP TABLE IF EXISTS PP.ODS_BINS;
 CREATE TABLE PP.ODS_BINS (
     bin_id                      STRING
@@ -184,17 +172,6 @@ CREATE TABLE PP.HUB_PARTNERS (
 
 DROP TABLE IF EXISTS PP.SAT_PARTNERS;
 CREATE TABLE PP.SAT_PARTNERS (
-    partner_id                  STRING NOT NULL
-    , partner_name              STRING NOT NULL
-    , tag                       STRING NOT NULL
-    , processed_dttm            TIMESTAMP NOT NULL
-    , valid_from_dttm           TIMESTAMP NOT NULL
-    , valid_to_dttm             TIMESTAMP
-    , _hash                     BYTES NOT NULL
-);
-
-DROP TABLE IF EXISTS PP.TMP_PARTNERS;
-CREATE TABLE PP.TMP_PARTNERS (
     partner_id                  STRING NOT NULL
     , partner_name              STRING NOT NULL
     , tag                       STRING NOT NULL
