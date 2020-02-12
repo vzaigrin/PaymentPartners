@@ -75,10 +75,9 @@ CREATE TABLE PP.TMP_DATA (
     , payment_total             FLOAT64
     , payment_tariff            FLOAT64
     , payment_main_client       FLOAT64
-    , payment_visa              FLOAT64
+    , payment_ps                FLOAT64
     , payment_partner           FLOAT64
     , payment_other_client      FLOAT64
-    , privilege_type            STRING
     , processed_dttm            TIMESTAMP
 );
 
@@ -95,7 +94,7 @@ CREATE TABLE PP.ODS_DATA (
     , payment_total             FLOAT64
     , payment_tariff            FLOAT64
     , payment_main_client       FLOAT64
-    , payment_visa              FLOAT64
+    , payment_ps                FLOAT64
     , payment_partner           FLOAT64
     , payment_other_client      FLOAT64
     , processed_dttm            TIMESTAMP
