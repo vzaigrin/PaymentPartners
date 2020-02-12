@@ -14,6 +14,7 @@ do
         do
             echo $file
             go run load_hist_data.go $partner 2019 $month $file
+            sleep 15m
         done
     done
 done
@@ -22,5 +23,6 @@ for num in {1..12}
 do
     echo -n " " $num
     go run data2dm.go 2019 $num
+    sleep 15m
 done
 echo " done"

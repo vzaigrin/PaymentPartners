@@ -175,6 +175,7 @@ BEGIN
 		, transaction_amount * (ps_financing / 100.0) AS payment_ps
 		, transaction_amount * (partner_financing / 100.0) AS payment_partner
 		, 0.0 AS payment_other_client
+		, CASE WHEN (transaction_amount < 10.0) THEN 'free' ELSE 'discount' END AS privilege_type
 		, load_ts AS processed_dttm
 	FROM PP.ODS_RETAIL
 	;

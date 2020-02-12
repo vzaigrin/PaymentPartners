@@ -78,6 +78,7 @@ CREATE TABLE PP.TMP_DATA (
     , payment_ps                FLOAT64
     , payment_partner           FLOAT64
     , payment_other_client      FLOAT64
+    , privilege_type            STRING
     , processed_dttm            TIMESTAMP
 );
 

@@ -99,6 +99,10 @@
     {
       "target": "payment_other_client",
       "source": "0.0"
+    },
+    {
+      "target": "privilege_type",
+      "source": "CASE WHEN (transaction_amount < 10.0) THEN 'free' ELSE 'discount' END"
     }
   ]
 }

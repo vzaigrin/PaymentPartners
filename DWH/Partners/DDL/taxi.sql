@@ -175,6 +175,7 @@ BEGIN
 		, tariff * (ps_financing / 100.0) AS payment_ps
 		, tariff * (taxi_financing / 100.0) AS payment_partner
 		, 0.0 AS payment_other_client
+		, CASE WHEN (tariff * (1 - (ps_financing + taxi_financing) / 100.0) < 10.0) THEN 'free' ELSE 'discount' END AS privilege_type
 		, load_ts AS processed_dttm
 	FROM PP.ODS_TAXI
 	;

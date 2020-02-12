@@ -33,7 +33,7 @@ BEGIN
             o.*
             , MD5(CONCAT(bin, card_number, CAST(operation_ts AS STRING), CAST(period_year AS STRING), CAST(period_month AS STRING), period_name,
                 operation_country, operation_city, CAST(payment_total AS STRING), CAST(payment_tariff AS STRING), CAST(payment_main_client AS STRING),
-                CAST(payment_ps AS STRING), CAST(payment_partner AS STRING), CAST(payment_other_client AS STRING))) AS _hash
+                CAST(payment_ps AS STRING), CAST(payment_partner AS STRING), CAST(payment_other_client AS STRING), privilege_type)) AS _hash
         FROM PP.TMP_DATA o
     ) t
     LEFT JOIN PP.SAT_PARTNERS p

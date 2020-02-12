@@ -97,6 +97,10 @@
     {
       "target": "payment_other_client",
       "source": "0.0"
+    },
+    {
+      "target": "privilege_type",
+      "source": "'free'"
     }
   ]
 }

@@ -289,6 +289,7 @@
             +tab+ +tab+ ", " (gethash "payment_ps" dds-hash) " AS payment_ps" +nl+
             +tab+ +tab+ ", " (gethash "payment_partner" dds-hash) " AS payment_partner" +nl+
             +tab+ +tab+ ", " (gethash "payment_other_client" dds-hash) " AS payment_other_client" +nl+
+            +tab+ +tab+ ", " (gethash "privilege_type" dds-hash) " AS privilege_type" +nl+
             +tab+ +tab+ ", load_ts AS processed_dttm" +nl+
             +tab+ "FROM " +ds+ ".ODS_" (string-upcase partner) +nl+
             +tab+ ";" +nl+

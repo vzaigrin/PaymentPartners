@@ -175,6 +175,7 @@ BEGIN
 		, base_price * (discount / 100.0) AS payment_ps
 		, 0.0 AS payment_partner
 		, 0.0 AS payment_other_client
+		, CASE WHEN (base_price * (1 - (discount / 100.0)) < 1.0) THEN 'free' ELSE 'discount' END AS privilege_type
 		, load_ts AS processed_dttm
 	FROM PP.ODS_CINEMA
 	;

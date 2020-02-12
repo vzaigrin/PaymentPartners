@@ -175,6 +175,7 @@ BEGIN
 		, payment_tariff * (payment_ps / 100.0) AS payment_ps
 		, payment_tariff * (1 - (payment_ps / 100.0)) AS payment_partner
 		, 0.0 AS payment_other_client
+		, 'free' AS privilege_type
 		, load_ts AS processed_dttm
 	FROM PP.ODS_TELECOM
 	;
