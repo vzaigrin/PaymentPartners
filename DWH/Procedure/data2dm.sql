@@ -68,9 +68,9 @@ BEGIN
         ON d.data_id = ldr.data_id
         JOIN PP.SAT_PRIVILEGES r
         ON ldr.privilege_id = r.privilege_id
-        JOIN PP.LNK_DATA_CITY ldc
+        LEFT JOIN PP.LNK_DATA_CITY ldc
         ON d.data_id = ldc.data_id
-        JOIN PP.SAT_CITY c
+        LEFT JOIN PP.SAT_CITY c
         ON ldc.city_id = c.city_id
         WHERE period_year = pyear AND period_month = pmonth
     )

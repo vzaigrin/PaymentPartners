@@ -36,11 +36,11 @@ BEGIN
                 CAST(payment_ps AS STRING), CAST(payment_partner AS STRING), CAST(payment_other_client AS STRING), privilege_type)) AS _hash
         FROM PP.TMP_DATA o
     ) t
-    LEFT JOIN PP.SAT_PARTNERS p
-    ON UPPER(p.partner_name) = partner
+    INNER JOIN PP.SAT_PARTNERS p
+    ON UPPER(p.partner_name) = UPPER(partner)
     INNER JOIN PP.SAT_BINS b
     ON b.bin = t.bin
-    INNER JOIN PP.SAT_PRIVILEGES l
+    LEFT JOIN PP.SAT_PRIVILEGES l
     ON l.privilege_type = t.privilege_type
     LEFT JOIN PP.SAT_CITY c
     ON t.operation_city = c.id
