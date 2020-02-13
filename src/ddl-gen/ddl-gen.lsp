@@ -136,7 +136,7 @@
 (defun create-view (partner)
     "Возвращаем строку для создания представлений"
     (concatenate 'string
-        "CREATE OR REPLACE VIEW `" +project+ "." (string-upcase partner) ".V_DM_LOADS` AS" +nl+
+        "CREATE OR REPLACE VIEW `" +project+ ".PP.V_DM_LOADS_" (string-upcase partner) "` AS" +nl+
         "SELECT" +nl+
         +tab+ "period_name" +nl+
         +tab+ ", period_year" +nl+
@@ -151,7 +151,7 @@
         "WHERE upper(p.partner_name) = '" (string-upcase partner) "'" +nl+
         ";" +nl+
         +nl+
-        "CREATE OR REPLACE VIEW `" +project+ "." (string-upcase partner) ".V_DM_BANK` AS" +nl+
+        "CREATE OR REPLACE VIEW `" +project+ ".PP.V_DM_BANK_" (string-upcase partner) "` AS" +nl+
         "SELECT" +nl+
         +tab+ "sum_opers" +nl+
         +tab+ ", avg_total" +nl+
@@ -165,7 +165,7 @@
         "WHERE upper(p.partner_name) = '" (string-upcase partner) "'" +nl+
         ";" +nl+
         +nl+
-        "CREATE OR REPLACE VIEW `" +project+ "." (string-upcase partner) ".V_DM_CARD` AS" +nl+
+        "CREATE OR REPLACE VIEW `" +project+ ".PP.V_DM_CARD_" (string-upcase partner) "` AS" +nl+
         "SELECT" +nl+
         +tab+ "sum_opers" +nl+
         +tab+ ", avg_total" +nl+
@@ -179,7 +179,7 @@
         "WHERE upper(p.partner_name) = '" (string-upcase partner) "'" +nl+
         ";" +nl+
         +nl+
-        "CREATE OR REPLACE VIEW `" +project+ "." (string-upcase partner) ".V_DM_CITY` AS" +nl+
+        "CREATE OR REPLACE VIEW `" +project+ ".PP.V_DM_CITY_" (string-upcase partner) "` AS" +nl+
         "SELECT" +nl+
         +tab+ "sum_opers" +nl+
         +tab+ ", avg_total" +nl+
@@ -193,7 +193,7 @@
         "WHERE upper(p.partner_name) = '" (string-upcase partner) "'" +nl+
         ";" +nl+
         +nl+
-        "CREATE OR REPLACE VIEW `" +project+ "." (string-upcase partner) ".V_DM_COUNTRY` AS" +nl+
+        "CREATE OR REPLACE VIEW `" +project+ ".PP.V_DM_COUNTRY_" (string-upcase partner) "` AS" +nl+
         "SELECT" +nl+
         +tab+ "sum_opers" +nl+
         +tab+ ", avg_total" +nl+
@@ -207,7 +207,7 @@
         "WHERE upper(p.partner_name) = '" (string-upcase partner) "'" +nl+
         ";" +nl+
         +nl+
-        "CREATE OR REPLACE VIEW `" +project+ "." (string-upcase partner) ".V_DM_PRIVILEGE` AS" +nl+
+        "CREATE OR REPLACE VIEW `" +project+ ".PP.V_DM_PRIVILEGE_" (string-upcase partner) "` AS" +nl+
         "SELECT" +nl+
         +tab+ "sum_opers" +nl+
         +tab+ ", privilege_type" +nl+
@@ -220,7 +220,7 @@
         "WHERE upper(p.partner_name) = '" (string-upcase partner) "'" +nl+
         ";" +nl+
         +nl+
-        "CREATE OR REPLACE VIEW `" +project+ "." (string-upcase partner) ".V_DM_PAYMENT` AS" +nl+
+        "CREATE OR REPLACE VIEW `" +project+ ".PP.V_DM_PAYMENT_" (string-upcase partner) "` AS" +nl+
         "SELECT" +nl+
         +tab+ "avg_client" +nl+
         +tab+ ", avg_ps" +nl+
