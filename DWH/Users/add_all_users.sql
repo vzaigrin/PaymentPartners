@@ -1,0 +1,13 @@
+DECLARE result STRING;
+CALL PP.ADD_USER ('admin', 'admin', 'admin', result);
+SELECT result;
+CALL PP.ADD_USER ('analyst', 'analyst', 'analyst', result);
+SELECT result;
+CALL PP.ADD_USER ('cinema', 'cinema', 'user', result);
+SELECT result;
+CALL PP.ADD_USER ('retail', 'retail', 'user', result);
+SELECT result;
+CALL PP.ADD_USER ('taxi', 'taxi', 'user', result);
+SELECT result;
+CALL PP.ADD_USER ('telecom', 'telecom', 'user', result);
+SELECT result;

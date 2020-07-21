@@ -1,0 +1,12 @@
+-- Процедура добавления сессии для пользователя
+CREATE OR REPLACE PROCEDURE PP.ADD_SESSION (IN username STRING, OUT id STRING)
+BEGIN
+    DECLARE valid_from TIMESTAMP DEFAULT CURRENT_TIMESTAMP();
+    DECLARE valid_to TIMESTAMP DEFAULT TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL 12 HOUR);
+    
+    SET id = GENERATE_UUID();
+
+    INSERT INTO PP.U_SESSIONS VALUES (id, username, valid_from, valid_to);
+    RETURN;
+
+END;
