@@ -1,5 +1,5 @@
 # Partners of the Payment System
-Проектная работа курса [Data Engineer](https://otus.ru/lessons/data-engineer/) от Otus.
+Проектная работа курсов [Data Engineer](https://otus.ru/lessons/data-engineer/) и [Архитектура и шаблоны проектирования](https://otus.ru/lessons/patterns/) от Otus.
 
 Проект основан на реальной системе. Для предотвращения раскрытия коммерческой информации название сервиса и компаний-партнёров изменены.
 
